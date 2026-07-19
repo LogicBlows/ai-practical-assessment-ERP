@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SmeErp.Domain.Entities;
+using SmeErp.Infrastructure.Persistence.Seed;
 
 namespace SmeErp.Infrastructure.Persistence.Configurations;
 
@@ -24,5 +25,7 @@ public class CompanySettingConfiguration : IEntityTypeConfiguration<CompanySetti
             .WithMany(c => c.Settings)
             .HasForeignKey(s => s.CompanyId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasData(CompanySettingSeedData.Settings);
     }
 }
