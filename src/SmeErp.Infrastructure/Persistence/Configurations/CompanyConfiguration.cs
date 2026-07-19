@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SmeErp.Domain.Entities;
+using SmeErp.Infrastructure.Persistence.Seed;
 
 namespace SmeErp.Infrastructure.Persistence.Configurations;
 
@@ -60,5 +61,7 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
 
         builder.Property(c => c.LogoPath)
             .HasMaxLength(500);
+
+        builder.HasData(CompanySeedData.Companies);
     }
 }
