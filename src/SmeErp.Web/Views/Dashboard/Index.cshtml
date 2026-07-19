@@ -1,0 +1,13 @@
+@{
+    ViewData["Title"] = "Dashboard";
+    var companyId = ViewData["CompanyId"];
+}
+
+<div class="text-center">
+    <h1 class="display-6">Dashboard</h1>
+    <p class="lead text-muted">Welcome to SmeErp. Module pages will be added here.</p>
+    @if (companyId is not null)
+    {
+        <p class="text-muted">Current company ID: <strong>@companyId</strong></p>
+    }
+</div>
