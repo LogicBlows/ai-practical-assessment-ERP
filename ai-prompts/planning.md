@@ -315,3 +315,62 @@ business type.
 - Rejected: none.
 
 **Commit:** "Add missing seed data for products, customers, settings (prompt #5)"
+
+
+
+
+## Prompt #6 — Authentication, Roles, and Current-Company Resolution
+**Date:** 2026-07-19
+
+**Prompt:**
+Add authentication and multi-tenant user scoping to the SmeErp application.
+
+1. Extend ApplicationUser (already extending IdentityUser) with a
+   CompanyId (int) property — the company this user belongs to.
+
+2. Seed two roles via RoleManager: "Admin" and "Proprietor".
+
+3. Seed two ApplicationUsers via UserManager, each linked to one of the
+   already-seeded companies:
+   - admin@sharmatrading.com, CompanyId = 1 (Sharma Trading Co.), role "Proprietor"
+   - admin@vermadist.com, CompanyId = 2 (Verma Distributors), role "Proprietor"
+   Use a seeded password that's clearly a placeholder (e.g. "Passw0rd!123")
+   and note in a code comment that this is for local/demo use only.
+
+4. Create an ICurrentCompanyService interface and implementation in
+   SmeErp.Infrastructure that, given the currently authenticated user
+   (via IHttpContextAccessor), returns that user's CompanyId. Register
+   it in DI as scoped.
+
+5. Implement a login/logout flow using ASP.NET Identity's
+   SignInManager and Razor views (simple email + password form, no
+   registration page — users are seeded, not self-registered).
+   On successful login, redirect to a placeholder /Dashboard page.
+
+6. Add [Authorize] to a placeholder DashboardController so unauthenticated
+   users are redirected to login.
+
+Do not implement the DB-stored JWT signing key yet — that's a separate
+step. Do not build Products/Customers/Quotations pages yet — just the
+login flow and the CurrentCompanyService plumbing. Run
+'dotnet ef migrations add SeedUsersAndRoles' and apply it after the
+role/user seeding is added.
+
+**Response summary:**
+Cursor extended ApplicationUser with CompanyId, seeded roles (Admin,
+Proprietor) and two users (admin@sharmatrading.com -> Company 1,
+admin@vermadist.com -> Company 2), created ICurrentCompanyService
+resolving the logged-in user's CompanyId via IHttpContextAccessor,
+and implemented login/logout with a placeholder [Authorize] Dashboard.
+Generated and applied migration 20260719192330_SeedUsersAndRoles.
+Verified by logging in as both seeded accounts — dashboard correctly
+displayed "Current company ID: 1" and "2" respectively, confirming
+correct per-user tenant resolution.
+
+**Accepted / Changed / Rejected:**
+- Accepted: full auth flow, role seeding, CurrentCompanyService.
+- Changed: none — ran smoothly once the port-conflict issue (unrelated
+  to this prompt) was resolved.
+- Rejected: none.
+
+**Commit:** "Add auth, seeded users/roles, and current-company resolution (prompt #6)"
