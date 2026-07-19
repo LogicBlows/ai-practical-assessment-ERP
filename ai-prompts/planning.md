@@ -66,7 +66,65 @@ implemented at this stage, as instructed.
 **Date:** 2026-07-19
 
 **Prompt:**
-[paste the exact Prompt #2 text you used]
+In the SmeErp.Domain project, create the following entities as plain
+C# classes (no EF Core attributes yet — that comes later in Infrastructure
+configuration):
+
+Company
+- Id (int)
+- Name, Tagline, Address, City, State, Country, PinCode (string)
+- GstNumber, PanNumber (string)
+- Mobile, Email, Website (string)
+- LogoPath (string, nullable)
+
+CompanySetting
+- Id (int)
+- CompanyId (int, FK to Company)
+- Key (string)
+- Value (string)
+
+Product
+- Id (int)
+- CompanyId (int, FK to Company)
+- Name, Sku, Barcode (string)
+- SellingPrice (decimal)
+- GstPercent (decimal)
+- CurrentStock (int)
+
+Customer
+- Id (int)
+- CompanyId (int, FK to Company)
+- Name, Code (string)
+- Mobile, City, State, Address (string)
+
+Quotation
+- Id (int)
+- CompanyId (int, FK to Company)
+- QuotationNumber (string)
+- CustomerId (int, FK to Customer)
+- QuotationDate, ValidUntil (DateTime)
+- SubTotal, TaxAmount, DiscountAmount, TotalAmount (decimal)
+- Notes (string, nullable)
+
+QuotationLine
+- Id (int)
+- QuotationId (int, FK to Quotation)
+- ProductId (int, FK to Product)
+- Quantity (int)
+- UnitPrice (decimal)
+- DiscountPercent (decimal)
+- GstPercent (decimal)
+- TaxAmount (decimal)
+- TotalAmount (decimal)
+
+Rules:
+- Company itself does NOT have a CompanyId (it IS the tenant).
+- Add simple navigation properties where natural (e.g. Quotation has a
+  collection of QuotationLine, Product/Customer belong to Company) but
+  do not add EF Core Fluent API configuration yet — that will be a
+  separate step in the Infrastructure project.
+- Do not create the DbContext, migrations, or seed data yet — entities only.
+- Follow the existing project's namespace conventions (SmeErp.Domain.Entities).
 
 **Response summary:**
 Cursor generated 6 entities: Company (in SmeErp.Domain/Entities/) and
