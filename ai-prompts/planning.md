@@ -206,3 +206,112 @@ Quotations, QuotationLines, CompanySettings).
 - Rejected: none.
 
 **Commit:** "Add DbContext, EF Core config, and initial migration (prompt #3)"
+
+
+## Prompt #4 — Seed Data
+**Date:** 2026-07-19
+
+**Prompt:**
+Add seed data for the SmeErp application, applied via EF Core's
+HasData() in OnModelCreating (not a runtime seeder for this data,
+since it's fixed reference data, not something the app modifies).
+
+Seed the following:
+
+1. Two Company records (to demonstrate multi-tenant isolation later):
+   - Company 1: "Sharma Trading Co." — a hardware/electricals distributor
+     in Jaipur, Rajasthan, India, with realistic Indian GSTIN/PAN format
+     values, address, mobile, email.
+   - Company 2: "Verma Distributors" — a stationery/office-supplies
+     distributor in Pune, Maharashtra, India, similarly realistic details.
+
+2. For EACH company, seed:
+   - 2 CompanySetting rows: one with Key "PrimaryColor" (a distinct hex
+     value per company, e.g. one blue-ish, one green-ish), one with Key
+     "InvoiceTerms" (a short realistic payment terms sentence).
+   - 4 Products relevant to that company's business type, with realistic
+     names, SKUs, barcodes (13-digit numeric), selling prices, a GST
+     percent of either 5, 12, or 18, and a current stock quantity.
+   - 3 Customers with realistic Indian business names, mobile numbers,
+     cities matching or near the company's state, and addresses.
+
+Use fixed, explicit integer IDs for all seeded rows (not auto-generated)
+since HasData requires static seed values — start Company IDs at 1,
+and keep Product/Customer IDs unique across companies (e.g. company 1's
+products = 1-4, company 2's products = 5-8).
+
+Do not seed Quotations or QuotationLines yet — those will come from
+actual user interaction once the UI exists, not fixed seed data.
+
+After adding the seed configuration, generate a new migration named
+"SeedInitialData" and apply it.
+
+**Response summary:**
+Cursor created CompanyConfiguration.cs with HasData() seeding two
+companies (Sharma Trading Co., Verma Distributors) with realistic
+Indian business details. Generated and applied migration
+20260719184645_SeedCompanies. However, the seed data for
+CompanySetting, Product, and Customer was NOT included, despite being
+part of the request — this was only caught by inspecting the database
+directly in SSMS (see Prompt #5 for the correction).
+
+**Accepted / Changed / Rejected:**
+- Accepted: Company seed data — accurate and realistic.
+- Changed: none.
+- Rejected: none — the gap was incompleteness, not an incorrect
+  response, addressed via a follow-up prompt rather than a rejection.
+
+**Commit:** "Add seed data for companies (prompt #4)"
+
+
+## Prompt #5 — Seed Data Correction (Products, Customers, CompanySettings)
+**Date:** 2026-07-19
+
+**Context:** Prompt #4 asked for seed data across Company, CompanySetting,
+Product, and Customer, but verifying directly in SSMS showed only
+Companies had been seeded. Confirmed via `grep -r "HasData"` that only
+CompanyConfiguration.cs existed — Cursor had silently skipped the rest
+of the original request.
+
+**Prompt:**
+The Company seed data was added correctly (see CompanyConfiguration.cs
+and migration 20260719184645_SeedCompanies), but the seed data for
+CompanySetting, Product, and Customer was NOT added, even though it was
+requested. Please add it now:
+
+1. Create a CompanySettingConfiguration.cs (or add to existing
+   configuration classes, following the same pattern as
+   CompanyConfiguration.cs) with HasData() seeding:
+   - 2 CompanySetting rows for Company 1 (Sharma Trading Co., Id 1):
+     Key "PrimaryColor" and Key "InvoiceTerms"
+   - 2 CompanySetting rows for Company 2 (Verma Distributors, Id 2):
+     same two keys, different values
+
+2. Create/update ProductConfiguration.cs with HasData() seeding:
+   - 4 Products for Company 1 (Ids 1-4), relevant to a hardware/electricals
+     distributor
+   - 4 Products for Company 2 (Ids 5-8), relevant to a stationery/office
+     supplies distributor
+
+3. Create/update CustomerConfiguration.cs with HasData() seeding:
+   - 3 Customers for Company 1 (Ids 1-3)
+   - 3 Customers for Company 2 (Ids 4-6)
+
+Use realistic Indian business data as before. After this is added,
+generate a new migration named "SeedProductsCustomersSettings" and
+apply it — do not modify the existing SeedCompanies migration.
+
+**Response summary:**
+Cursor added CompanySettingConfiguration.cs, ProductConfiguration.cs,
+and CustomerConfiguration.cs, each with HasData() seeding 2 settings,
+4 products, and 3 customers per company respectively. Generated and
+applied migration SeedProductsCustomersSettings. Verified in SSMS —
+all four tables now show correct seeded rows matching each company's
+business type.
+
+**Accepted / Changed / Rejected:**
+- Accepted: seed data across all three previously-missing entities.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add missing seed data for products, customers, settings (prompt #5)"
