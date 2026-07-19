@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\SmeErp.Application\SmeErp.Application.csproj" />
+    <ProjectReference Include="..\SmeErp.Infrastructure\SmeErp.Infrastructure.csproj" />
+    <ProjectReference Include="..\SmeErp.Shared\SmeErp.Shared.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+</Project>
