@@ -142,3 +142,67 @@ naturally (e.g. Quotation.Lines, Company.Products/Customers/Settings).
 - Rejected: none.
 
 **Commit:** "Add Domain entities (prompt #2)"
+
+
+## Prompt #3 — DbContext, EF Core Configuration, Migration
+**Date:** 2026-07-19
+
+**Prompt:**
+Now set up EF Core in SmeErp.Infrastructure for the entities already
+created in SmeErp.Domain.
+
+1. Create an AppDbContext class in SmeErp.Infrastructure/Persistence/
+   that inherits from IdentityDbContext<ApplicationUser> (create a basic
+   ApplicationUser class extending IdentityUser if it doesn't exist yet,
+   with an additional FullName string property).
+
+2. Add DbSet<T> properties for: Company, CompanySetting, Product,
+   Customer, Quotation, QuotationLine.
+
+3. In OnModelCreating, add Fluent API configuration for each entity:
+   - Primary keys
+   - Required string fields with reasonable max lengths (e.g. Name 200,
+     Sku 100, Email 256, GstNumber 20)
+   - Decimal precision or all money/percentage fields: use
+     .HasPrecision(18, 2) for currency fields (SellingPrice, SubTotal,
+     TaxAmount, DiscountAmount, TotalAmount, UnitPrice) and
+     .HasPrecision(5, 2) for percentage fields (GstPercent, DiscountPercent)
+   - Foreign key relationships with appropriate DeleteBehavior (use
+     Restrict for Company -> Product/Customer/Quotation/CompanySetting
+     to avoid cascade delete issues, Cascade for Quotation -> QuotationLine)
+   - Index on CompanyId for every tenant-scoped entity, since these will
+     be filtered on constantly
+
+4. Register AppDbContext in SmeErp.Web's Program.cs (or Startup.cs,
+   whichever this project uses) with SQL Server, reading the connection
+   string from appsettings.json under a key called "DefaultConnection".
+   Use a placeholder value like
+   "Server=(localdb)\\mssqllocaldb;Database=SmeErpDb;Trusted_Connection=True;"
+   in appsettings.json — no real credentials.
+
+5. Generate the initial EF Core migration named "InitialCreate".
+
+Do not implement seed data yet — that will be a separate prompt so I can
+review the migration first. Do not implement authentication/login logic
+yet either — just get AppDbContext, Identity wiring, and the migration
+in place.
+
+**Response summary:**
+Cursor created AppDbContext (inheriting IdentityDbContext<ApplicationUser>)
+in SmeErp.Infrastructure/Persistence/, added DbSets for all domain
+entities, configured Fluent API (field lengths, decimal precision,
+FK relationships, CompanyId indexes), registered EF Core + SQL Server
+in SmeErp.Web's Program.cs reading from appsettings.json, and generated
+the InitialCreate migration. Verified by running
+`dotnet ef database update` against a local SQL Server Express instance
+(DESKTOP-TUD67TP\SQLEXPRESS) — confirmed SmeErpDb was created with all
+expected tables (Identity tables + Companies, Products, Customers,
+Quotations, QuotationLines, CompanySettings).
+
+**Accepted / Changed / Rejected:**
+- Accepted: DbContext structure, Fluent API config, migration.
+- Changed: updated appsettings.json connection string to point to local
+  SQL Server Express instance instead of the LocalDB placeholder.
+- Rejected: none.
+
+**Commit:** "Add DbContext, EF Core config, and initial migration (prompt #3)"
