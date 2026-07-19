@@ -8,11 +8,11 @@ companies sharing the same application instance).
 Set up a .NET 6 solution using Clean Architecture, named SmeErp, with
 this exact project structure:
 
-- SmeErp.Domain         — entities, enums, domain interfaces only, no dependencies
-- SmeErp.Application    — DTOs, service interfaces, ServiceResult<T> pattern, business logic
-- SmeErp.Infrastructure — EF Core DbContext, migrations, ASP.NET Identity, repository/service implementations
-- SmeErp.Shared         — constants, setting keys, theme helper constants
-- SmeErp.Web            — ASP.NET Core MVC (Razor views + controllers), wwwroot
+- SmeErp.Domain         - entities, enums, domain interfaces only, no dependencies
+- SmeErp.Application    - DTOs, service interfaces, ServiceResult<T> pattern, business logic
+- SmeErp.Infrastructure - EF Core DbContext, migrations, ASP.NET Identity, repository/service implementations
+- SmeErp.Shared         - constants, setting keys, theme helper constants
+- SmeErp.Web            - ASP.NET Core MVC (Razor views + controllers), wwwroot
 
 Also create:
 - SmeErp.Application.Tests — xUnit test project referencing Application
@@ -59,3 +59,28 @@ implemented at this stage, as instructed.
 - Rejected: none at this stage — scaffold matched the request.
 
 **Commit:** "Scaffold: Clean Architecture solution (prompt #1)"
+
+
+
+## Prompt #2 — Domain Entities
+**Date:** 2026-07-19
+
+**Prompt:**
+[paste the exact Prompt #2 text you used]
+
+**Response summary:**
+Cursor generated 6 entities: Company (in SmeErp.Domain/Entities/) and
+CompanySetting, Product, Customer, Quotation, QuotationLine (organized
+under a new Entities/TenantScoped/ subfolder — Cursor's own addition,
+not explicitly requested). CompanyId correctly omitted from Company and
+present on all tenant-scoped entities. Navigation properties added
+naturally (e.g. Quotation.Lines, Company.Products/Customers/Settings).
+
+**Accepted / Changed / Rejected:**
+- Accepted: all field names, types, and CompanyId placement exactly as specified.
+- Accepted (unprompted): the TenantScoped/ subfolder split — a reasonable
+  structural choice that visually reinforces the tenant boundary.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add Domain entities (prompt #2)"
