@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SmeErp.Application.Common;
 using SmeErp.Application.DTOs;
 using SmeErp.Application.Interfaces.Services;
+using SmeErp.Application.Services;
 using SmeErp.Domain.Entities;
 using SmeErp.Infrastructure.Persistence;
 
@@ -66,16 +67,18 @@ public class QuotationService : IQuotationService
         foreach (var input in request.Lines)
         {
             var product = products[input.ProductId];
-            var lineSubtotal = input.Quantity * input.UnitPrice;
-            var lineDiscount = lineSubtotal * (input.DiscountPercent / 100m);
-            var lineTaxableAmount = lineSubtotal - lineDiscount;
-            var lineTax = lineTaxableAmount * (product.GstPercent / 100m);
-            var lineTotal = lineTaxableAmount + lineTax;
+            var lineTotals = QuotationTotalsCalculator.CalculateLine(new QuotationLineCalculationInput
+            {
+                Quantity = input.Quantity,
+                UnitPrice = input.UnitPrice,
+                DiscountPercent = input.DiscountPercent,
+                GstPercent = product.GstPercent
+            });
 
-            subTotal += lineSubtotal;
-            discountAmount += lineDiscount;
-            taxAmount += lineTax;
-            totalAmount += lineTotal;
+            subTotal += lineTotals.LineSubtotal;
+            discountAmount += lineTotals.LineDiscount;
+            taxAmount += lineTotals.LineTax;
+            totalAmount += lineTotals.LineTotal;
 
             quotationLines.Add(new QuotationLine
             {
@@ -84,8 +87,8 @@ public class QuotationService : IQuotationService
                 UnitPrice = input.UnitPrice,
                 DiscountPercent = input.DiscountPercent,
                 GstPercent = product.GstPercent,
-                TaxAmount = lineTax,
-                TotalAmount = lineTotal
+                TaxAmount = lineTotals.LineTax,
+                TotalAmount = lineTotals.LineTotal
             });
         }
 

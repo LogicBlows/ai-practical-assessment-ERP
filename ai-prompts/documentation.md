@@ -234,3 +234,35 @@ recorded in ai-prompts/documentation.md as Prompt #7.
 **Commit:** "Document dashboard KPI cards feature in planning and debugging notes (prompt #13 entry)"
 
 
+## Prompt #8 — Generate Planning.md Entry and Test-Results.md for Mandatory xUnit Tests
+**Date:** 2026-07-21
+
+**Prompt:**
+Append an entry to ai-prompts/planning.md documenting "Prompt #14 —
+Mandatory xUnit Tests (Quotation Calculation, Settings Defaults)",
+using the same format as existing entries. Use the exact test prompt
+text I gave at the start of this session as the "Prompt" field, and
+note in the "Response summary" that dotnet test confirmed 2/2 tests
+passing (Total: 2, Failed: 0, Succeeded: 2, Duration: 3.6s).
+
+Then append an entry to ai-prompts/documentation.md documenting this
+prompt itself as "Prompt #8 — Generate Planning.md Entry and
+Test-Results.md for Mandatory xUnit Tests".
+
+**Response summary:**
+Cursor appended Prompt #14 to ai-prompts/planning.md with the full
+original mandatory xUnit tests prompt text and a response summary
+covering QuotationTotalsCalculator extraction, both test classes,
+InMemory EF setup, and dotnet test results (2/2 passing, 3.6s duration).
+Test names and pass/fail results were already recorded in
+test-results.md at the repository root. This meta-documentation prompt
+was recorded in ai-prompts/documentation.md as Prompt #8.
+
+**Accepted / Changed / Rejected:**
+- Accepted: Prompt #14 planning entry and Prompt #8 documentation entry
+  added in the correct format.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Document mandatory xUnit tests in planning.md (prompt #14 entry)"
+
