@@ -1,0 +1,44 @@
+@model QuotationIndexViewModel
+@{
+    ViewData["Title"] = "Quotations";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Quotations</h1>
+    <a asp-action="Create" class="btn btn-primary">New quotation</a>
+</div>
+
+@if (Model.Quotations.Count == 0)
+{
+    <p class="text-muted">No quotations found.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Number</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th class="text-end">Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var quotation in Model.Quotations)
+                {
+                    <tr>
+                        <td>@quotation.QuotationNumber</td>
+                        <td>@quotation.CustomerName</td>
+                        <td>@quotation.QuotationDate.ToString("dd MMM yyyy")</td>
+                        <td class="text-end">@quotation.TotalAmount.ToString("N2")</td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@quotation.Id" class="btn btn-sm btn-outline-primary">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

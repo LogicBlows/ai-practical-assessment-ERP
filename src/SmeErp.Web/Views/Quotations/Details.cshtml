@@ -1,0 +1,74 @@
+@model QuotationDetailDto
+@{
+    ViewData["Title"] = $"Quotation {Model.QuotationNumber}";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">@Model.QuotationNumber</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary">Back to list</a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Customer</dt>
+            <dd class="col-sm-8">@Model.CustomerName</dd>
+            <dt class="col-sm-4">Quotation date</dt>
+            <dd class="col-sm-8">@Model.QuotationDate.ToString("dd MMM yyyy")</dd>
+            <dt class="col-sm-4">Valid until</dt>
+            <dd class="col-sm-8">@Model.ValidUntil.ToString("dd MMM yyyy")</dd>
+        </dl>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Model.Notes))
+    {
+        <div class="col-md-6">
+            <h2 class="h6 text-muted">Notes</h2>
+            <p class="mb-0">@Model.Notes</p>
+        </div>
+    }
+</div>
+
+<div class="table-responsive mb-4">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th class="text-end">Qty</th>
+                <th class="text-end">Unit price</th>
+                <th class="text-end">Discount %</th>
+                <th class="text-end">GST %</th>
+                <th class="text-end">Tax</th>
+                <th class="text-end">Line total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var line in Model.Lines)
+            {
+                <tr>
+                    <td>@line.ProductName</td>
+                    <td class="text-end">@line.Quantity</td>
+                    <td class="text-end">@line.UnitPrice.ToString("N2")</td>
+                    <td class="text-end">@line.DiscountPercent.ToString("N2")</td>
+                    <td class="text-end">@line.GstPercent.ToString("N2")</td>
+                    <td class="text-end">@line.TaxAmount.ToString("N2")</td>
+                    <td class="text-end">@line.TotalAmount.ToString("N2")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="row justify-content-end">
+    <div class="col-md-4">
+        <dl class="row mb-0">
+            <dt class="col-6">Subtotal</dt>
+            <dd class="col-6 text-end">@Model.SubTotal.ToString("N2")</dd>
+            <dt class="col-6">Discount</dt>
+            <dd class="col-6 text-end">@Model.DiscountAmount.ToString("N2")</dd>
+            <dt class="col-6">Tax</dt>
+            <dd class="col-6 text-end">@Model.TaxAmount.ToString("N2")</dd>
+            <dt class="col-6 fw-bold">Total</dt>
+            <dd class="col-6 text-end fw-bold">@Model.TotalAmount.ToString("N2")</dd>
+        </dl>
+    </div>
+</div>

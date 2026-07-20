@@ -1,0 +1,171 @@
+@model CreateQuotationViewModel
+@using SmeErp.Application.DTOs
+@{
+    ViewData["Title"] = "New quotation";
+}
+
+<h1 class="h3 mb-4">New quotation</h1>
+
+<form asp-action="Create" method="post" id="quotation-form">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <label asp-for="CustomerId" class="form-label"></label>
+            <select asp-for="CustomerId" class="form-select" asp-items="@(new SelectList(Model.Customers, nameof(CustomerListItemDto.Id), nameof(CustomerListItemDto.Name)))">
+                <option value="">-- Select customer --</option>
+            </select>
+            <span asp-validation-for="CustomerId" class="text-danger"></span>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="QuotationDate" class="form-label"></label>
+            <input asp-for="QuotationDate" class="form-control" />
+            <span asp-validation-for="QuotationDate" class="text-danger"></span>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="ValidUntil" class="form-label"></label>
+            <input asp-for="ValidUntil" class="form-control" />
+            <span asp-validation-for="ValidUntil" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Notes" class="form-label"></label>
+        <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="h5 mb-0">Line items</h2>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="add-line">Add line</button>
+    </div>
+
+    <div id="line-items">
+        @for (var i = 0; i < Model.Lines.Count; i++)
+        {
+            <div class="row g-2 mb-2 line-item">
+                <div class="col-md-4">
+                    <label class="form-label">Product</label>
+                    <select class="form-select product-select" name="Lines[@i].ProductId">
+                        <option value="">-- Select product --</option>
+                        @foreach (var product in Model.Products)
+                        {
+                            if (Model.Lines[i].ProductId == product.Id)
+                            {
+                                <option value="@product.Id" data-price="@product.SellingPrice" selected="selected">@product.Name (@product.Sku)</option>
+                            }
+                            else
+                            {
+                                <option value="@product.Id" data-price="@product.SellingPrice">@product.Name (@product.Sku)</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Quantity</label>
+                    <input class="form-control" name="Lines[@i].Quantity" type="number" min="1" value="@(Model.Lines[i].Quantity == 0 ? 1 : Model.Lines[i].Quantity)" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Unit price</label>
+                    <input class="form-control unit-price" name="Lines[@i].UnitPrice" type="number" step="0.01" min="0" value="@Model.Lines[i].UnitPrice" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Discount %</label>
+                    <input class="form-control" name="Lines[@i].DiscountPercent" type="number" step="0.01" min="0" max="100" value="@Model.Lines[i].DiscountPercent" />
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="button" class="btn btn-outline-danger remove-line w-100">Remove</button>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Create quotation</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+<template id="line-item-template">
+    <div class="row g-2 mb-2 line-item">
+        <div class="col-md-4">
+            <label class="form-label">Product</label>
+            <select class="form-select product-select" data-name="ProductId">
+                <option value="">-- Select product --</option>
+                @foreach (var product in Model.Products)
+                {
+                    <option value="@product.Id" data-price="@product.SellingPrice">@product.Name (@product.Sku)</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Quantity</label>
+            <input class="form-control" data-name="Quantity" type="number" min="1" value="1" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Unit price</label>
+            <input class="form-control unit-price" data-name="UnitPrice" type="number" step="0.01" min="0" value="0" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Discount %</label>
+            <input class="form-control" data-name="DiscountPercent" type="number" step="0.01" min="0" max="100" value="0" />
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="button" class="btn btn-outline-danger remove-line w-100">Remove</button>
+        </div>
+    </div>
+</template>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const container = document.getElementById('line-items');
+            const template = document.getElementById('line-item-template');
+            const addButton = document.getElementById('add-line');
+
+            function reindexLines() {
+                container.querySelectorAll('.line-item').forEach((row, index) => {
+                    row.querySelectorAll('[name], [data-name]').forEach(input => {
+                        const field = input.getAttribute('name')?.split('.').pop()
+                            || input.getAttribute('data-name');
+                        if (field) {
+                            input.setAttribute('name', `Lines[${index}].${field}`);
+                            input.removeAttribute('data-name');
+                        }
+                    });
+                });
+            }
+
+            function bindProductSelect(select) {
+                select.addEventListener('change', function () {
+                    const option = select.options[select.selectedIndex];
+                    const price = option.getAttribute('data-price');
+                    const row = select.closest('.line-item');
+                    const unitPriceInput = row.querySelector('.unit-price');
+                    if (price && unitPriceInput) {
+                        unitPriceInput.value = price;
+                    }
+                });
+            }
+
+            container.querySelectorAll('.product-select').forEach(bindProductSelect);
+
+            addButton.addEventListener('click', function () {
+                const clone = template.content.firstElementChild.cloneNode(true);
+                container.appendChild(clone);
+                reindexLines();
+                bindProductSelect(clone.querySelector('.product-select'));
+            });
+
+            container.addEventListener('click', function (event) {
+                if (event.target.classList.contains('remove-line')) {
+                    const rows = container.querySelectorAll('.line-item');
+                    if (rows.length > 1) {
+                        event.target.closest('.line-item').remove();
+                        reindexLines();
+                    }
+                }
+            });
+        })();
+    </script>
+}
