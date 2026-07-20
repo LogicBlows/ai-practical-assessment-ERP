@@ -3,11 +3,13 @@
     var companyId = ViewData["CompanyId"];
 }
 
-<div class="text-center">
-    <h1 class="display-6">Dashboard</h1>
-    <p class="lead text-muted">Welcome to SmeErp. Module pages will be added here.</p>
-    @if (companyId is not null)
-    {
-        <p class="text-muted">Current company ID: <strong>@companyId</strong></p>
-    }
+<div class="card page-card shadow-sm">
+    <div class="card-body text-center py-5">
+        <h1 class="display-6 mb-3">Dashboard</h1>
+        <p class="lead text-muted mb-4">Welcome to SmeErp. Module pages will be added here.</p>
+        @if (companyId is not null)
+        {
+            <p class="text-muted mb-0">Current company ID: <strong>@companyId</strong></p>
+        }
+    </div>
 </div>

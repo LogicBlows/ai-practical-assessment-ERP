@@ -1,5 +1,7 @@
 html {
   font-size: 14px;
+  position: relative;
+  min-height: 100%;
 }
 
 @media (min-width: 768px) {
@@ -8,11 +10,53 @@ html {
   }
 }
 
-html {
-  position: relative;
-  min-height: 100%;
-}
-
 body {
   margin-bottom: 60px;
+  background-color: #f8f9fa;
+}
+
+.company-navbar {
+  background-color: var(--company-navbar-bg, #2c3e50) !important;
+}
+
+.company-navbar .navbar-brand,
+.company-navbar .nav-link,
+.company-navbar .btn-link {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+.company-navbar .nav-link:hover,
+.company-navbar .navbar-brand:hover,
+.company-navbar .btn-link:hover {
+  color: #fff !important;
+}
+
+.company-navbar .btn-link {
+  text-decoration: none;
+}
+
+.page-card {
+  border: none;
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.08);
+}
+
+.page-card .card-header {
+  background-color: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
