@@ -435,3 +435,59 @@ randomly-generated key with a correct 30-day expiration window.
 - Rejected: none.
 
 **Commit:** "Add DB-stored JWT signing key generation and rotation (prompt #7)"
+
+
+## Prompt #8 — Products and Customers List/Search Pages
+**Date:** 2026-07-20
+
+**Prompt:**
+Build the Products and Customers list pages for the SmeErp application,
+scoped to the current user's company via ICurrentCompanyService.
+
+1. Create a ProductsController (SmeErp.Web) with an Index action that
+   lists all Products where CompanyId matches the current user's
+   company, and supports a keyword search query parameter matching
+   against Name, Sku, or Barcode.
+
+2. Create a CustomersController similarly, listing Customers scoped to
+   the current company, with keyword search against Name or Code.
+
+3. Both actions should go through an Application-layer service
+   (e.g. IProductService, ICustomerService in SmeErp.Application) that
+   accepts the CompanyId and search term, returning DTOs — no direct
+   DbContext or repository calls from the controllers.
+
+4. Create simple Razor views (Index.cshtml for each) showing a table
+   of results and a search input box that submits via GET.
+
+5. Add both to the main navigation in _Layout.cshtml, visible only to
+   authenticated users.
+
+6. Add [Authorize] to both controllers.
+
+Do not implement create/edit forms yet — list + search only, per Core
+scope. Do not implement Quotations yet.
+
+**Response summary:**
+Cursor introduced ServiceResult<T> in SmeErp.Application along with
+ProductListItemDto and CustomerListItemDto, IProductService and
+ICustomerService interfaces, and ProductService/CustomerService
+implementations in Infrastructure (EF queries filtered by CompanyId with
+optional keyword search, projected to DTOs). ProductsController and
+CustomersController resolve the current company via ICurrentCompanyService,
+delegate to the Application services, and return Index views with GET
+search forms and Bootstrap result tables. Products and Customers nav
+links were added to _Layout.cshtml for authenticated users only. Both
+controllers are decorated with [Authorize]. Verified by build
+(dotnet build SmeErp.sln — 0 warnings) and manual testing: Sharma
+Trading sees 4 hardware products and 3 Jaipur customers; Verma
+Distributors sees 4 stationery products and 3 Pune customers, confirming
+correct per-tenant scoping.
+
+**Accepted / Changed / Rejected:**
+- Accepted: Application-layer services with DTOs, company-scoped list +
+  search, Razor views, nav links, [Authorize] on both controllers.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add Products and Customers list/search pages (prompt #8)"
