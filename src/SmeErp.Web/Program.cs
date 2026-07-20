@@ -35,6 +35,7 @@ builder.Services.AddScoped<ICurrentCompanyService, CurrentCompanyService>();
 builder.Services.AddScoped<ISigningKeyService, SigningKeyService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IQuotationService, QuotationService>();
 
 builder.Services.AddControllersWithViews();
 
