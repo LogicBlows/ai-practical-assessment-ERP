@@ -579,3 +579,94 @@ output on the detail view, and cross-tenant isolation was confirmed
 - Rejected: none.
 
 **Commit:** "Add quotation create, list, and detail flow (prompt #9)"
+
+
+## Prompt #10 — Company Settings and Quotation PDF Generation
+**Date:** 2026-07-20
+
+**Prompt:**
+Build the Company Settings page and Quotation PDF generation for the
+SmeErp application, scoped to the current user's company.
+
+1. Create a CompanySettingsViewModel/DTO covering: CompanyName, Address,
+   City, State, Country, PinCode, GstNumber, PanNumber, Mobile, Email,
+   Website, plus settings-driven values: PrimaryColor (hex), InvoiceTerms.
+
+2. Create ICompanySettingsService/CompanySettingsService in
+   Application/Infrastructure with:
+   - GetAsync(companyId): reads the Company entity plus its
+     CompanySetting rows (PrimaryColor, InvoiceTerms), returning a
+     combined DTO. If PrimaryColor or InvoiceTerms settings don't exist
+     yet for this company, return sensible defaults (e.g. "#1F2937" for
+     color, a generic terms sentence) rather than failing.
+   - UpdateAsync(companyId, dto): updates the Company entity's fields
+     AND upserts the CompanySetting rows for PrimaryColor and
+     InvoiceTerms (create if missing, update if present).
+
+3. Create SettingsController ([Authorize]) with Index (GET, shows
+   current settings in a form) and Index (POST, saves changes and
+   redirects back with a success message).
+
+4. Create Settings/Index.cshtml — a form covering all the fields above,
+   including a simple HTML color picker input for PrimaryColor.
+
+5. Implement PDF generation for a Quotation using QuestPDF (add the
+   NuGet package; note it requires a community license configuration
+   for non-commercial/small business use — set
+   QuestPDF.Settings.License = LicenseType.Community in Program.cs).
+   Create IQuotationPdfService/QuotationPdfService that, given a
+   QuotationDetailDto and the company's CompanySettingsDto, generates a
+   PDF with:
+   - Header: company name, address, GSTIN, PAN, contact info, using
+     PrimaryColor as an accent color for the header background/text
+   - Quotation number, date, valid-until, customer name and address
+   - A table of line items: product name, quantity, unit price,
+     discount%, GST%, line total
+   - Totals section: subtotal, discount, tax, grand total — also
+     styled with PrimaryColor
+   - Footer: invoice terms text from settings
+
+6. Add a "Download PDF" button on the Quotation Details page/controller
+   action that streams the generated PDF as a file download.
+
+After implementing, this is important to verify manually: change the
+Settings (address and PrimaryColor) and confirm the NEXT generated PDF
+reflects the updated values — do not implement any caching that would
+prevent this.
+
+**Response summary:**
+Cursor added CompanySettingsDto and ICompanySettingsService in
+SmeErp.Application, with CompanySettingsService in Infrastructure
+reading Company + CompanySetting rows (defaults "#1F2937" and generic
+invoice terms when missing; upserts settings on update).
+CompanySettingKeys constants were added to SmeErp.Shared. On the web
+layer: CompanySettingsViewModel, SettingsController ([Authorize] GET/POST
+Index with TempData success message), Settings/Index.cshtml with an HTML
+color picker, and a Settings nav link for authenticated users. QuestPDF
+2024.12.3 was added; QuestPDF.Settings.License = LicenseType.Community
+was set in Program.cs. IQuotationPdfService/QuotationPdfService generates
+a branded PDF (header with PrimaryColor accent, quotation meta, customer
+address, line-items table, totals, footer terms). QuotationsController
+DownloadPdf(id) loads fresh quotation and settings from the database on
+each request (no caching) and streams the file; a Download PDF button
+was added to Quotations/Details.cshtml. QuotationDetailDto was extended
+with CustomerAddress, CustomerCity, and CustomerState for PDF display.
+Settings-to-PDF consistency was manually verified by changing the company
+address and PrimaryColor in Settings, then downloading a quotation PDF
+and confirming the updated values appeared. A font rendering bug was found
+after initial implementation: words containing "ti" were corrupted in the
+PDF (e.g. "Quotation" rendered as "Quotaon", "Valid until" as "Valid unl")
+due to QuestPDF's default font ligature handling. This was fixed in
+QuotationPdfService by explicitly setting FontFamily("Arial") on the page
+DefaultTextStyle and disabling StandardLigatures, rather than relying on
+QuestPDF's automatic font fallback.
+
+**Accepted / Changed / Rejected:**
+- Accepted: company settings CRUD flow, QuestPDF integration, PDF download
+  action, no caching on PDF generation, font rendering fix.
+- Changed: QuotationDetailDto extended with customer address fields for
+  PDF; DefaultTextStyle updated to use Arial with ligatures disabled after
+  discovering the "ti" corruption bug.
+- Rejected: none.
+
+**Commit:** "Add company settings and quotation PDF generation (prompt #10)"

@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Infrastructure;
 using SmeErp.Application.Interfaces.Services;
 using SmeErp.Infrastructure.Identity;
 using SmeErp.Infrastructure.Persistence;
 using SmeErp.Infrastructure.Persistence.Seed;
 using SmeErp.Infrastructure.Services;
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +39,8 @@ builder.Services.AddScoped<ISigningKeyService, SigningKeyService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IQuotationService, QuotationService>();
+builder.Services.AddScoped<ICompanySettingsService, CompanySettingsService>();
+builder.Services.AddScoped<IQuotationPdfService, QuotationPdfService>();
 
 builder.Services.AddControllersWithViews();
 
