@@ -48,6 +48,17 @@
                             </li>
                         }
                     </ul>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <form class="d-flex align-items-center me-3 my-2 my-sm-0" method="get" asp-controller="Search" asp-action="Index">
+                            <input class="form-control form-control-sm"
+                                   type="search"
+                                   name="keyword"
+                                   placeholder="Search..."
+                                   aria-label="Search" />
+                            <button class="btn btn-outline-light btn-sm ms-2" type="submit">Go</button>
+                        </form>
+                    }
                     <ul class="navbar-nav ms-sm-auto">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
