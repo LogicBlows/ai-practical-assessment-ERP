@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SmeErp.Infrastructure.Identity;
 using SmeErp.Infrastructure.Persistence;
+using SmeErp.Infrastructure.Persistence.Seed;
 using SmeErp.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,12 +31,14 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentCompanyService, CurrentCompanyService>();
+builder.Services.AddScoped<ISigningKeyService, SigningKeyService>();
 
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
 await IdentitySeeder.SeedAsync(app.Services);
+await SigningKeySeeder.SeedAsync(app.Services);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

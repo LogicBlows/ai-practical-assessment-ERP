@@ -24,6 +24,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<QuotationLine> QuotationLines => Set<QuotationLine>();
 
+    public DbSet<SigningKey> SigningKeys => Set<SigningKey>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
