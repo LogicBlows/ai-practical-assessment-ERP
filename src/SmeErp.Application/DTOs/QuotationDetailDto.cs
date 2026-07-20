@@ -10,6 +10,12 @@ public class QuotationDetailDto
 
     public string CustomerName { get; set; } = string.Empty;
 
+    public string CustomerAddress { get; set; } = string.Empty;
+
+    public string CustomerCity { get; set; } = string.Empty;
+
+    public string CustomerState { get; set; } = string.Empty;
+
     public DateTime QuotationDate { get; set; }
 
     public DateTime ValidUntil { get; set; }

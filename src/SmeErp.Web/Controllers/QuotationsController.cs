@@ -14,17 +14,23 @@ public class QuotationsController : Controller
     private readonly IQuotationService _quotationService;
     private readonly ICustomerService _customerService;
     private readonly IProductService _productService;
+    private readonly ICompanySettingsService _companySettingsService;
+    private readonly IQuotationPdfService _quotationPdfService;
 
     public QuotationsController(
         ICurrentCompanyService currentCompanyService,
         IQuotationService quotationService,
         ICustomerService customerService,
-        IProductService productService)
+        IProductService productService,
+        ICompanySettingsService companySettingsService,
+        IQuotationPdfService quotationPdfService)
     {
         _currentCompanyService = currentCompanyService;
         _quotationService = quotationService;
         _customerService = customerService;
         _productService = productService;
+        _companySettingsService = companySettingsService;
+        _quotationPdfService = quotationPdfService;
     }
 
     public async Task<IActionResult> Index()
@@ -120,6 +126,32 @@ public class QuotationsController : Controller
         }
 
         return View(result.Data);
+    }
+
+    public async Task<IActionResult> DownloadPdf(int id)
+    {
+        var companyId = await GetCompanyIdOrChallengeAsync();
+        if (companyId is null)
+        {
+            return Challenge();
+        }
+
+        var quotationResult = await _quotationService.GetDetailAsync(companyId.Value, id);
+        if (!quotationResult.Succeeded || quotationResult.Data is null)
+        {
+            return NotFound();
+        }
+
+        var settingsResult = await _companySettingsService.GetAsync(companyId.Value);
+        if (!settingsResult.Succeeded || settingsResult.Data is null)
+        {
+            return View("Error");
+        }
+
+        var pdfBytes = _quotationPdfService.GeneratePdf(quotationResult.Data, settingsResult.Data);
+        var fileName = $"{quotationResult.Data.QuotationNumber}.pdf";
+
+        return File(pdfBytes, "application/pdf", fileName);
     }
 
     private async Task<int?> GetCompanyIdOrChallengeAsync()
