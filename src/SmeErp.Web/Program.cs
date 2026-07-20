@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SmeErp.Application.Interfaces.Services;
 using SmeErp.Infrastructure.Identity;
 using SmeErp.Infrastructure.Persistence;
 using SmeErp.Infrastructure.Persistence.Seed;
@@ -32,6 +33,8 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentCompanyService, CurrentCompanyService>();
 builder.Services.AddScoped<ISigningKeyService, SigningKeyService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 builder.Services.AddControllersWithViews();
 
