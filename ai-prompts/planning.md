@@ -722,3 +722,125 @@ search, quotation creation, and PDF download were all confirmed working.
 
 **Commit:** "Apply Bootswatch theme and card-based UI styling (prompt #11)"
 
+
+## Prompt #12 — Global Search
+**Date:** 2026-07-20
+
+**Prompt:**
+Build global search for the SmeErp application, scoped to the current
+user's company via ICurrentCompanyService.
+
+1. Create ISearchService/SearchService in Application/Infrastructure
+   with SearchAsync(companyId, keyword) that, for keywords of at least
+   2 characters, queries:
+   - Products (match Name, Sku, or Barcode)
+   - Customers (match Name or Code)
+   - Quotations (match QuotationNumber, or the linked Customer's Name)
+   Returns a combined result DTO with separate lists (or a unified list
+   tagged by type), each item including enough info to link to its
+   detail/edit page (id, display name/title, type, and a route/URL).
+
+2. Add a search box to the top navigation in _Layout.cshtml (a simple
+   GET form submitting to a new SearchController).
+
+3. Create SearchController ([Authorize]) with an Index action that
+   calls SearchAsync and returns a results view.
+
+4. Create Search/Index.cshtml showing results grouped by type
+   (Products, Customers, Quotations), each linking to its respective
+   detail page. Show a friendly "no results" message if nothing matches
+   or if the keyword is under 2 characters.
+
+Keep this simple — no autocomplete/AJAX needed, a full page reload on
+search submit is fine for Core scope.
+
+**Response summary:**
+Cursor added SearchResultType, SearchResultItemDto, and
+GlobalSearchResultDto in SmeErp.Application, with ISearchService and
+SearchService in Infrastructure implementing company-scoped search
+across Products (Name/Sku/Barcode), Customers (Name/Code), and
+Quotations (QuotationNumber or linked Customer name), returning grouped
+results with display names, subtitles, and URLs. SearchController
+([Authorize]) and Search/Index.cshtml show results by type with friendly
+messages for short keywords and no matches; a GET search form was added
+to the navbar in _Layout.cshtml for authenticated users. ISearchService
+was registered in Program.cs. Two bugs were found and fixed during
+verification: (1) SearchService originally used Task.WhenAll on a shared
+DbContext, causing an InvalidOperationException ("A second operation was
+started on this context instance"); fixed by running the three searches
+sequentially with separate await calls. (2) IQuotationPdfService was
+missing from DI registration in Program.cs, causing QuotationsController
+to fail entirely; fixed by adding
+`builder.Services.AddScoped<IQuotationPdfService, QuotationPdfService>()`.
+Cross-tenant isolation was verified after both fixes (each company's
+search results only include its own products, customers, and quotations).
+
+**Accepted / Changed / Rejected:**
+- Accepted: global search service, SearchController, grouped results
+  view, navbar search form, sequential DbContext queries, DI registration
+  fix for IQuotationPdfService.
+- Changed: SearchService refactored from Task.WhenAll to sequential
+  awaits after concurrency bug; Program.cs updated with missing PDF
+  service registration discovered during search/PDF verification.
+- Rejected: none.
+
+**Commit:** "Add global search across products, customers, and quotations (prompt #12)"
+
+
+## Prompt #13 — Dashboard KPI Cards
+**Date:** 2026-07-20
+
+**Prompt:**
+Build the minimal dashboard KPI cards for the SmeErp application,
+replacing the current placeholder Dashboard content, scoped to the
+current user's company.
+
+1. Create IDashboardService/DashboardService with GetSummaryAsync
+   (companyId) returning: TotalProducts, TotalCustomers,
+   TotalQuotationsToday (QuotationDate == today), and
+   PendingQuotations (define as quotations with ValidUntil >= today,
+   representing still-valid/open quotes) — all counted via real
+   database queries, not hardcoded.
+
+2. Update DashboardController's Index action to call this service and
+   pass the summary to the view.
+
+3. Update Dashboard/Index.cshtml to show these four values as
+   Bootstrap card components in a responsive row, with clear labels
+   (e.g. "Total Products", "Total Customers", "Quotations Today",
+   "Pending Quotations"), replacing the old "Current company ID: X"
+   placeholder text (that CompanyId debug info can be removed now,
+   its job is done).
+
+Keep it simple — four cards, real counts, no charts (charts are Stretch,
+not Core).
+
+**Response summary:**
+Cursor added DashboardSummaryDto and IDashboardService in
+SmeErp.Application, with DashboardService in Infrastructure implementing
+GetSummaryAsync via real EF Core CountAsync queries scoped by CompanyId:
+total products, total customers, quotations created today (QuotationDate
+within today's date range), and pending quotations (ValidUntil >= today).
+DashboardController was updated to call the service and pass a
+DashboardIndexViewModel; Dashboard/Index.cshtml now shows four responsive
+Bootstrap KPI cards and the placeholder "Current company ID" debug text
+was removed. IDashboardService was registered in Program.cs. During
+verification, DashboardService had the same Task.WhenAll concurrency bug
+as SearchService — four parallel CountAsync calls against a shared
+DbContext caused InvalidOperationException; fixed by replacing Task.WhenAll
+with sequential await calls. Both seeded users were verified to show
+correct, different KPI counts: admin@sharmatrading.com (4 products, 3
+customers, 3 quotations today, 3 pending) and admin@vermadist.com (4
+products, 3 customers, 0 quotations today, 0 pending).
+
+**Accepted / Changed / Rejected:**
+- Accepted: dashboard service with real DB counts, KPI card layout,
+  removal of CompanyId placeholder, sequential DbContext queries after
+  concurrency fix.
+- Changed: DashboardService refactored from Task.WhenAll to sequential
+  awaits after the same DbContext concurrency exception seen in
+  SearchService.
+- Rejected: none.
+
+**Commit:** "Add dashboard KPI cards with company-scoped counts (prompt #13)"
+

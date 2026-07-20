@@ -77,6 +77,8 @@ run, ensure no background `dotnet run` is still alive:
 `Get-Process dotnet | Stop-Process -Force` (target the specific PID if
 multiple dotnet processes are running). Then rebuild and apply migrations
 as normal.
+
+
 ## Issue 3 — QuestPDF Font Rendering Corrupted 'ti' Character Sequences
 
 ### Problem
@@ -137,3 +139,147 @@ private static TextStyle DefaultPdfTextStyle =>
 This ensures all header, content, and footer text inherits Arial with
 standard ligatures disabled, preventing "ti" (and similar) character
 pairs from being merged incorrectly.
+
+
+## Issue 4 — DbContext Concurrency Exception in Parallel Search Queries
+
+### Problem
+After Prompt #12 (global search), submitting a search from the navbar
+or Search/Index page threw `InvalidOperationException: A second operation
+was started on this context instance before a previous operation
+completed`. Search never returned results.
+
+### How I Investigated
+- Read the full exception stack trace; it pointed to
+  `SearchService.SearchAsync` and EF Core's `DbContext` concurrency
+  checks.
+- Opened `SearchService.cs` and found `Task.WhenAll` running
+  `SearchProductsAsync`, `SearchCustomersAsync`, and
+  `SearchQuotationsAsync` at the same time — all three used the same
+  scoped `AppDbContext` instance injected into `SearchService`.
+- Recognised this as the same EF Core anti-pattern: `DbContext` is not
+  safe for concurrent operations on a single scoped instance.
+
+### How AI Helped
+- Cursor identified that EF Core's `DbContext` is not thread-safe for
+  concurrent operations on a single instance.
+- Recommended the same fix used elsewhere: replace `Task.WhenAll` with
+  sequential `await` calls, one query at a time.
+
+### What I Validated
+- Rebuilt SmeErp.Infrastructure after the change.
+- Searched for a known Sharma Trading product (e.g. "Havells") — search
+  returned one product with no exception.
+- Confirmed cross-tenant isolation: Sharma's user sees only Sharma
+  products/customers/quotations in search results; Verma's user sees
+  only Verma's data.
+
+### Final Fix
+In `SearchService.SearchAsync`, replace parallel task execution with
+sequential awaits:
+
+```csharp
+var products = await SearchProductsAsync(companyId, trimmedKeyword, cancellationToken);
+var customers = await SearchCustomersAsync(companyId, trimmedKeyword, cancellationToken);
+var quotations = await SearchQuotationsAsync(companyId, trimmedKeyword, cancellationToken);
+```
+
+Do not use `Task.WhenAll` (or any other concurrent execution) against the
+same `DbContext` instance.
+
+
+## Issue 5 — Missing DI Registration for IQuotationPdfService
+
+### Problem
+After implementing global search, navigating to any Quotations page
+failed with `InvalidOperationException: Unable to resolve service for
+type 'IQuotationPdfService' while attempting to activate
+'QuotationsController'`. The entire quotations module was unusable,
+including quotation details and PDF download.
+
+### How I Investigated
+- Read the exception message — ASP.NET Core could not construct
+  `QuotationsController` because `IQuotationPdfService` was not
+  registered in the DI container.
+- Opened `Program.cs` and compared service registrations against
+  `QuotationsController`'s constructor dependencies.
+- Found `IQuotationPdfService` / `QuotationPdfService` was implemented
+  in Prompt #10 but never added to `builder.Services`; other recent
+  services (`ICompanySettingsService`, `ISearchService`,
+  `IDashboardService`) were registered correctly.
+
+### How AI Helped
+- Cursor audited all Application-layer service interfaces against
+  `Program.cs` registrations.
+- Added the missing line:
+  `builder.Services.AddScoped<IQuotationPdfService, QuotationPdfService>();`
+- Stopped a stale `SmeErp.Web` process that was locking DLLs, then
+  rebuilt to pick up the change.
+
+### What I Validated
+- `dotnet build SmeErp.sln` succeeded with 0 warnings.
+- Quotation Details page loads for an existing quotation.
+- Download PDF button generates and streams a valid PDF file.
+- Re-verified global search and cross-tenant isolation after the DI fix.
+
+### Final Fix
+Add the missing registration in `Program.cs`:
+
+```csharp
+builder.Services.AddScoped<IQuotationPdfService, QuotationPdfService>();
+```
+
+When adding new services, always register the interface-to-implementation
+mapping in `Program.cs` and verify controller activation resolves all
+constructor dependencies.
+
+
+## Issue 6 — Same DbContext Concurrency Bug Recurring in DashboardService
+
+### Problem
+After Prompt #13 (dashboard KPI cards), loading the Dashboard page threw
+`InvalidOperationException: A second operation was started on this
+context instance before a previous operation completed`. The dashboard
+failed to render any KPI values.
+
+### How I Investigated
+- Read the stack trace; it pointed to `DashboardService.GetSummaryAsync`
+  (line 52) and EF Core's DbContext concurrency guard.
+- Opened `DashboardService.cs` and found `Task.WhenAll` running four
+  `CountAsync` queries in parallel (TotalProducts, TotalCustomers,
+  TotalQuotationsToday, PendingQuotations) — all on the same scoped
+  `AppDbContext` instance.
+- Recognised this as the identical anti-pattern fixed earlier in
+  `SearchService` (Issue 4): EF Core `DbContext` is not thread-safe for
+  concurrent operations.
+
+### How AI Helped
+- Cursor applied the same fix as SearchService: replace `Task.WhenAll`
+  with sequential `await` calls, one count query at a time.
+- Scanned the entire codebase for other `Task.WhenAll` usages against
+  DbContext — none found beyond this instance.
+
+### What I Validated
+- Rebuilt SmeErp.Infrastructure after the change.
+- Called `GetSummaryAsync` for company 1 (Sharma Trading) — returned
+  4 products, 3 customers, 3 quotations today, 3 pending; no exception.
+- Called `GetSummaryAsync` for company 2 (Verma Distributors) — returned
+  4 products, 3 customers, 0 quotations today, 0 pending; confirming
+  correct, different counts per tenant.
+- Dashboard page loads correctly for both admin@sharmatrading.com and
+  admin@vermadist.com.
+
+### Final Fix
+In `DashboardService.GetSummaryAsync`, replace parallel task execution
+with sequential awaits:
+
+```csharp
+var totalProducts = await _dbContext.Products.CountAsync(...);
+var totalCustomers = await _dbContext.Customers.CountAsync(...);
+var quotationsToday = await _dbContext.Quotations.CountAsync(...);
+var pendingQuotations = await _dbContext.Quotations.CountAsync(...);
+```
+
+Never use `Task.WhenAll` against a single `DbContext` instance. This
+pattern has now caused bugs in both SearchService and DashboardService.
+
