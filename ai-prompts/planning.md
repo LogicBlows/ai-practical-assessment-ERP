@@ -491,3 +491,91 @@ correct per-tenant scoping.
 - Rejected: none.
 
 **Commit:** "Add Products and Customers list/search pages (prompt #8)"
+
+
+## Prompt #9 — Quotation Creation, List, and Detail Flow
+**Date:** 2026-07-20
+
+**Prompt:**
+Build the Quotation creation, list, and detail flow for the SmeErp
+application, scoped to the current user's company via
+ICurrentCompanyService.
+
+1. In SmeErp.Application, create DTOs:
+   - QuotationLineInputDto (ProductId, Quantity, UnitPrice, DiscountPercent)
+   - CreateQuotationRequestDto (CustomerId, QuotationDate, ValidUntil,
+     Notes, List<QuotationLineInputDto> Lines)
+   - QuotationListItemDto (Id, QuotationNumber, CustomerName,
+     QuotationDate, TotalAmount)
+   - QuotationDetailDto (all Quotation fields plus Customer name and a
+     list of line details with product name, quantity, unit price,
+     discount, GST percent, line tax amount, line total amount)
+
+2. Create IQuotationService/QuotationService in Application/Infrastructure
+   with:
+   - CreateAsync(companyId, CreateQuotationRequestDto): validates
+     CustomerId belongs to the same company, validates every line has
+     Quantity > 0 and a valid ProductId belonging to the same company,
+     then for each line calculates:
+       lineSubtotal = Quantity * UnitPrice
+       lineDiscount = lineSubtotal * (DiscountPercent / 100)
+       lineTaxableAmount = lineSubtotal - lineDiscount
+       lineTaxAmount = lineTaxableAmount * (GstPercent / 100)  [GstPercent
+         comes from the Product, not user input]
+       lineTotalAmount = lineTaxableAmount + lineTaxAmount
+     Then sums across all lines for the Quotation's SubTotal,
+     DiscountAmount, TaxAmount, TotalAmount. Auto-generates
+     QuotationNumber (e.g. "QT-{CompanyId}-{sequential or timestamp-based
+     number}"). Returns ServiceResult<int> (the new Quotation's Id) or
+     a validation failure with a clear message.
+   - GetListAsync(companyId): returns QuotationListItemDto list, scoped
+     to company, newest first.
+   - GetDetailAsync(companyId, quotationId): returns QuotationDetailDto,
+     or a not-found result if the quotation doesn't belong to this company.
+
+3. Create QuotationsController (SmeErp.Web), [Authorize]:
+   - Index: list view
+   - Create (GET): shows a form to select customer and add line items
+     (populate Customer and Product dropdowns scoped to current company)
+   - Create (POST): calls CreateAsync, redirects to Detail on success,
+     redisplays the form with validation errors on failure
+   - Details(id): shows the quotation detail view
+
+4. Create Razor views: Quotations/Index.cshtml (list table),
+   Quotations/Create.cshtml (form with a dynamic-feeling but simple
+   repeatable line-item section — plain HTML/JS is fine, no heavy
+   framework needed), Quotations/Details.cshtml (read-only detail view
+   showing all lines and totals).
+
+5. Add Quotations to the navigation.
+
+Do not implement PDF generation yet — that is a separate step. Do not
+allow editing an existing quotation after creation for now (Core scope
+is create + view, not edit).
+
+**Response summary:**
+Cursor added quotation DTOs (QuotationLineInputDto,
+CreateQuotationRequestDto, QuotationListItemDto, QuotationLineDetailDto,
+QuotationDetailDto) and IQuotationService in SmeErp.Application, with
+QuotationService in Infrastructure implementing CreateAsync (company-scoped
+validation, per-line discount/tax calculations using product GST%,
+quotation-level totals, and QT-{CompanyId}-{sequential} numbering),
+GetListAsync (newest first), and GetDetailAsync (not-found when outside
+the tenant). QuotationsController ([Authorize]) orchestrates list,
+create GET/POST, and detail actions; Razor views provide a list table,
+a create form with repeatable line items (plain JS add/remove and
+product price auto-fill), and a read-only detail page with line and
+totals breakdown. Quotations nav link added for authenticated users.
+Verified by build (dotnet build SmeErp.sln — 0 warnings) and manual
+testing: hand-calculated line and quotation totals matched the app's
+output on the detail view, and cross-tenant isolation was confirmed
+(Verma's user sees zero of Sharma's quotations).
+
+**Accepted / Changed / Rejected:**
+- Accepted: full create + list + detail flow, Application-layer service
+  with ServiceResult<T>, company-scoped validation and calculations,
+  Razor views, nav link, [Authorize] on controller.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add quotation create, list, and detail flow (prompt #9)"
