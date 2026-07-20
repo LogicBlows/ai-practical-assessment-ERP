@@ -670,3 +670,55 @@ QuestPDF's automatic font fallback.
 - Rejected: none.
 
 **Commit:** "Add company settings and quotation PDF generation (prompt #10)"
+
+
+## Prompt #11 — UI Styling Pass (Bootswatch Theme, Card Layouts)
+**Date:** 2026-07-20
+
+**Prompt:**
+The current UI uses the default unstyled Bootstrap MVC template look.
+Apply a clean, professional visual pass without changing any
+functionality or routes:
+
+1. Replace the default Bootstrap CSS with a Bootswatch theme (use the
+   "Cosmo" or "Flatly" theme — pick one, load it via CDN link in
+   _Layout.cshtml instead of the local bootstrap.css).
+2. Improve the navbar: make it use the current company's PrimaryColor
+   setting as an accent (read from ICompanySettingsService), add
+   reasonable padding/spacing.
+3. Style the Products, Customers, and Quotations list tables with
+   Bootstrap's table-striped and table-hover classes for readability.
+4. Give the Dashboard, Settings, and Quotation Create/Details pages
+   card-based layouts (Bootstrap .card component) instead of plain
+   unstyled divs, with reasonable spacing.
+5. Do not change any controller logic, routes, or functionality —
+   this is a visual-only pass.
+
+**Response summary:**
+Cursor applied a visual-only styling pass across SmeErp.Web with no
+controller, route, or functionality changes. Replaced the local
+bootstrap.min.css link in _Layout.cshtml with the Bootswatch Flatly
+theme (Bootstrap 5.1.3) loaded via jsDelivr CDN; removed conflicting
+btn-primary overrides from the scoped layout CSS. Added a
+CompanyBrandingViewComponent that reads the current company's
+PrimaryColor (and company name) via ICompanySettingsService and
+ICurrentCompanyService, exposing a CSS variable used to accent the
+navbar; improved navbar padding, dark styling, and collapsible layout.
+Products, Customers, and Quotations list tables use table-striped and
+table-hover (with table-light headers for contrast). Dashboard,
+Settings, and Quotation Create/Details pages were wrapped in Bootstrap
+.card layouts with headers, padding, and light shadows via site.css
+(.page-card, light page background). All pages were manually verified
+to still function correctly after the visual-only change — login,
+search, quotation creation, and PDF download were all confirmed working.
+
+**Accepted / Changed / Rejected:**
+- Accepted: Bootswatch Flatly CDN theme, PrimaryColor-accented navbar,
+  striped/hover list tables, card-based layouts on Dashboard/Settings/
+  Quotation Create/Details, visual-only scope with no controller changes.
+- Changed: none to application logic; ViewComponent added for navbar
+  branding (view-layer only).
+- Rejected: none.
+
+**Commit:** "Apply Bootswatch theme and card-based UI styling (prompt #11)"
+
