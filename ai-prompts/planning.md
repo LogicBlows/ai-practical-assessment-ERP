@@ -374,3 +374,64 @@ correct per-user tenant resolution.
 - Rejected: none.
 
 **Commit:** "Add auth, seeded users/roles, and current-company resolution (prompt #6)"
+
+## Prompt #7 — DB-Stored JWT Signing Key
+**Date:** 2026-07-20
+
+**Prompt:**
+Add DB-stored JWT signing key support to the SmeErp application, so
+JWT signing keys are generated at runtime and stored in the database
+instead of being hardcoded in appsettings.json or the codebase.
+
+1. Create a SigningKey entity in SmeErp.Domain:
+   - Id (int)
+   - KeyValue (string) — base64-encoded secret
+   - CreatedAt (DateTime)
+   - ExpiresAt (DateTime)
+   - IsActive (bool)
+
+2. Add a DbSet<SigningKey> to AppDbContext, with Fluent API config:
+   required KeyValue with max length 500, an index on IsActive.
+
+3. Create ISigningKeyService and SigningKeyService in
+   SmeErp.Infrastructure:
+   - GetActiveKeyAsync(): returns the current active, non-expired key,
+     generating and persisting a new one via RandomNumberGenerator if
+     none exists.
+   - RotateKeyAsync(): deactivates existing active keys and generates
+     a new one, with a 30-day expiration.
+
+4. Register ISigningKeyService in DI as scoped.
+
+5. Add a seeder (called at startup, alongside existing seeders) that
+   ensures at least one active signing key exists on first run —
+   do NOT hardcode any actual key value in code or configuration.
+
+6. Generate a migration named "AddSigningKeyTable" and apply it.
+
+Do not wire this key into actual JWT token generation/validation yet —
+that's a separate step once we decide whether JWTs are used for a
+separate API layer or purely for internal claims. For now, just get
+the table, service, and seeding in place and confirmed working.
+
+**Response summary:**
+Cursor created a SigningKey entity, added it to AppDbContext with Fluent
+API config (max length, IsActive index), implemented ISigningKeyService/
+SigningKeyService with GetActiveKeyAsync() (generates via
+RandomNumberGenerator if none exists) and RotateKeyAsync() (deactivates
+old keys, creates new one with 30-day expiry), registered it in DI, and
+added a startup seeder ensuring one active key exists on first run.
+Generated migration 20260720054641_AddSigningKeyTable. Applying it
+initially failed due to a stale dotnet process locking
+SmeErp.Infrastructure.dll (see debugging-notes.md); resolved by killing
+the process and rebuilding. Verified in SSMS via direct SQL query —
+SigningKeys table contains exactly one active, non-hardcoded,
+randomly-generated key with a correct 30-day expiration window.
+
+**Accepted / Changed / Rejected:**
+- Accepted: entity, service, seeding, migration — no key values hardcoded
+  anywhere in source or config, satisfying the no-secrets-in-repo requirement.
+- Changed: none in the generated code itself.
+- Rejected: none.
+
+**Commit:** "Add DB-stored JWT signing key generation and rotation (prompt #7)"
