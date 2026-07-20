@@ -1,15 +1,44 @@
+@model DashboardIndexViewModel
 @{
     ViewData["Title"] = "Dashboard";
-    var companyId = ViewData["CompanyId"];
 }
 
-<div class="card page-card shadow-sm">
-    <div class="card-body text-center py-5">
-        <h1 class="display-6 mb-3">Dashboard</h1>
-        <p class="lead text-muted mb-4">Welcome to SmeErp. Module pages will be added here.</p>
-        @if (companyId is not null)
-        {
-            <p class="text-muted mb-0">Current company ID: <strong>@companyId</strong></p>
-        }
+<div class="mb-4">
+    <h1 class="h3 mb-1">Dashboard</h1>
+    <p class="text-muted mb-0">Overview for your company</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card page-card shadow-sm h-100">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Total Products</p>
+                <p class="display-6 mb-0">@Model.Summary.TotalProducts</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card page-card shadow-sm h-100">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Total Customers</p>
+                <p class="display-6 mb-0">@Model.Summary.TotalCustomers</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card page-card shadow-sm h-100">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Quotations Today</p>
+                <p class="display-6 mb-0">@Model.Summary.TotalQuotationsToday</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card page-card shadow-sm h-100">
+            <div class="card-body">
+                <p class="text-muted text-uppercase small mb-1">Pending Quotations</p>
+                <p class="display-6 mb-0">@Model.Summary.PendingQuotations</p>
+            </div>
+        </div>
     </div>
 </div>

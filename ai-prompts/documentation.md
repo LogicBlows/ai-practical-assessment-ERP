@@ -145,3 +145,92 @@ in ai-prompts/documentation.md as Prompt #5.
 **Commit:** "Document UI styling pass in planning.md (prompt #11 entry)"
 
 
+## Prompt #6 — Generate Planning.md and Debugging-Notes Entries for Global Search Feature
+**Date:** 2026-07-20
+
+**Prompt:**
+Append an entry to ai-prompts/planning.md documenting "Prompt #12 —
+Global Search", using the same format as existing entries. Use the
+exact Global Search prompt text I gave at the start of this session as
+the "Prompt" field, and note in the "Response summary" that two bugs
+were found and fixed during verification: (1) SearchService originally
+used Task.WhenAll on a shared DbContext causing an
+InvalidOperationException, fixed by running searches sequentially; and
+(2) IQuotationPdfService was missing from DI registration in
+Program.cs, causing QuotationsController to fail entirely, fixed by
+adding the missing AddScoped registration. Note that cross-tenant
+isolation was verified after both fixes.
+
+Append two NEW entries to debugging-notes.md — check the file first to
+confirm Issues 1-3 already exist and do not duplicate them — add
+"## Issue 4 — DbContext Concurrency Exception in Parallel Search
+Queries" and "## Issue 5 — Missing DI Registration for
+IQuotationPdfService", following the existing template.
+
+Then append an entry to ai-prompts/documentation.md documenting this
+prompt itself as "Prompt #6 — Generate Planning.md and Debugging-Notes
+Entries for Global Search Feature".
+
+**Response summary:**
+Cursor appended Prompt #12 to ai-prompts/planning.md with the full
+original global search prompt text and a response summary covering
+ISearchService/SearchService, SearchController, grouped Search/Index
+view, navbar search form, and the two bugs fixed during verification
+(Task.WhenAll DbContext concurrency in SearchService; missing
+IQuotationPdfService DI registration), plus cross-tenant isolation
+verification. In ai-prompts/debugging-notes.md, Issues 4 and 5 were
+added (after confirming Issues 1–3 already existed) documenting the
+parallel DbContext search failure and the missing PDF service
+registration. This meta-documentation prompt was recorded in
+ai-prompts/documentation.md as Prompt #6.
+
+**Accepted / Changed / Rejected:**
+- Accepted: Prompt #12 planning entry, Issues 4 and 5 in debugging
+  notes, and Prompt #6 documentation entry — all in the correct format.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Document global search feature in planning and debugging notes (prompt #12 entry)"
+
+
+## Prompt #7 — Generate Planning.md and Debugging-Notes Entries for Dashboard KPIs Feature
+**Date:** 2026-07-20
+
+**Prompt:**
+Append an entry to ai-prompts/planning.md documenting "Prompt #13 —
+Dashboard KPI Cards", using the same format as existing entries. Use
+the exact Dashboard KPIs prompt text I gave at the start of this
+session as the "Prompt" field, and note that DashboardService had the
+same Task.WhenAll concurrency bug, fixed the same way. Note both seeded
+users were verified to show correct, different KPI counts.
+
+Append ONE new entry to debugging-notes.md — check the file first to
+confirm Issues 1-5 already exist and do not duplicate them — add
+"## Issue 6 — Same DbContext Concurrency Bug Recurring in
+DashboardService", following the existing template.
+
+Then append an entry to ai-prompts/documentation.md documenting this
+prompt as "Prompt #7 — Generate Planning.md and Debugging-Notes
+Entries for Dashboard KPIs Feature".
+
+**Response summary:**
+Cursor appended Prompt #13 to ai-prompts/planning.md with the full
+original dashboard KPIs prompt text and a response summary covering
+IDashboardService/DashboardService, DashboardController/Index view
+with four Bootstrap KPI cards, the Task.WhenAll DbContext concurrency
+fix in DashboardService, and verification that both seeded users
+(Sharma Trading and Verma Distributors) show correct, different counts.
+In ai-prompts/debugging-notes.md, Issue 6 was added (after confirming
+Issues 1–5 already existed) documenting the recurring parallel
+DbContext bug in DashboardService. This meta-documentation prompt was
+recorded in ai-prompts/documentation.md as Prompt #7.
+
+**Accepted / Changed / Rejected:**
+- Accepted: Prompt #13 planning entry, Issue 6 in debugging notes, and
+  Prompt #7 documentation entry — all in the correct format.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Document dashboard KPI cards feature in planning and debugging notes (prompt #13 entry)"
+
+

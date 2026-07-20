@@ -7,20 +7,20 @@ using SmeErp.Web.Models;
 namespace SmeErp.Web.Controllers;
 
 [Authorize]
-public class DashboardController : Controller
+public class SearchController : Controller
 {
     private readonly ICurrentCompanyService _currentCompanyService;
-    private readonly IDashboardService _dashboardService;
+    private readonly ISearchService _searchService;
 
-    public DashboardController(
+    public SearchController(
         ICurrentCompanyService currentCompanyService,
-        IDashboardService dashboardService)
+        ISearchService searchService)
     {
         _currentCompanyService = currentCompanyService;
-        _dashboardService = dashboardService;
+        _searchService = searchService;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? keyword)
     {
         var companyId = await _currentCompanyService.GetCompanyIdAsync();
         if (companyId is null)
@@ -28,15 +28,16 @@ public class DashboardController : Controller
             return Challenge();
         }
 
-        var result = await _dashboardService.GetSummaryAsync(companyId.Value);
+        var result = await _searchService.SearchAsync(companyId.Value, keyword);
         if (!result.Succeeded || result.Data is null)
         {
             return View("Error");
         }
 
-        var viewModel = new DashboardIndexViewModel
+        var viewModel = new SearchIndexViewModel
         {
-            Summary = result.Data
+            Keyword = keyword,
+            Results = result.Data
         };
 
         return View(viewModel);

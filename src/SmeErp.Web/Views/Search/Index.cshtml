@@ -1,0 +1,100 @@
+@model SearchIndexViewModel
+@{
+    ViewData["Title"] = "Search";
+    var keyword = Model.Results.Keyword;
+}
+
+<div class="card page-card shadow-sm">
+    <div class="card-header py-3">
+        <h1 class="h4 mb-0">Search</h1>
+    </div>
+    <div class="card-body p-4">
+        <form method="get" asp-action="Index" class="row g-2 mb-4">
+            <div class="col-md-8">
+                <input type="search"
+                       name="keyword"
+                       value="@keyword"
+                       class="form-control"
+                       placeholder="Search products, customers, quotations..."
+                       autofocus />
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+
+        @if (Model.Results.KeywordTooShort)
+        {
+            <p class="text-muted mb-0">Enter at least 2 characters to search.</p>
+        }
+        else if (!string.IsNullOrWhiteSpace(keyword) && !Model.Results.HasResults)
+        {
+            <p class="text-muted mb-0">No results found for "<strong>@keyword</strong>".</p>
+        }
+        else if (Model.Results.HasResults)
+        {
+            <p class="text-muted mb-4">Results for "<strong>@keyword</strong>"</p>
+
+            @if (Model.Results.Products.Count > 0)
+            {
+                <h2 class="h5 mb-3">Products</h2>
+                <ul class="list-group list-group-flush mb-4">
+                    @foreach (var item in Model.Results.Products)
+                    {
+                        <li class="list-group-item px-0">
+                            <a href="@item.Url" class="text-decoration-none">
+                                @item.DisplayName
+                            </a>
+                            @if (!string.IsNullOrWhiteSpace(item.Subtitle))
+                            {
+                                <span class="text-muted"> — @item.Subtitle</span>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+
+            @if (Model.Results.Customers.Count > 0)
+            {
+                <h2 class="h5 mb-3">Customers</h2>
+                <ul class="list-group list-group-flush mb-4">
+                    @foreach (var item in Model.Results.Customers)
+                    {
+                        <li class="list-group-item px-0">
+                            <a href="@item.Url" class="text-decoration-none">
+                                @item.DisplayName
+                            </a>
+                            @if (!string.IsNullOrWhiteSpace(item.Subtitle))
+                            {
+                                <span class="text-muted"> — @item.Subtitle</span>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+
+            @if (Model.Results.Quotations.Count > 0)
+            {
+                <h2 class="h5 mb-3">Quotations</h2>
+                <ul class="list-group list-group-flush mb-0">
+                    @foreach (var item in Model.Results.Quotations)
+                    {
+                        <li class="list-group-item px-0">
+                            <a href="@item.Url" class="text-decoration-none">
+                                @item.DisplayName
+                            </a>
+                            @if (!string.IsNullOrWhiteSpace(item.Subtitle))
+                            {
+                                <span class="text-muted"> — @item.Subtitle</span>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+        }
+        else
+        {
+            <p class="text-muted mb-0">Enter a keyword above to search across products, customers, and quotations.</p>
+        }
+    </div>
+</div>
