@@ -482,3 +482,85 @@ diagram image.
 
 **Commit:** "Add ui-flow.md documenting page navigation and user flows (prompt #13 entry)"
 
+
+## Prompt #14 — Generate acceptance-criteria.md
+**Date:** 2026-07-24
+
+**Prompt:**
+Read the Core Acceptance Criteria for Option 3 (.NET Full-Stack — SME
+ERP) from the assessment requirements, and cross-reference each item
+against what has actually been implemented and verified in this
+codebase (controllers, views, tests, migrations, debugging-notes.md).
+
+Draft acceptance-criteria.md as a checklist matching this exact
+structure:
+
+## Core
+- [ ] A user can log in with seeded credentials
+- [ ] A user can list and search products from the database
+- [ ] A user can list customers from the database
+- [ ] A user can create a quotation with multiple line items via the UI
+- [ ] A user can view the quotation list and open a detail view
+- [ ] A user can download/print a quotation PDF
+- [ ] PDF company address, GSTIN, terms, and accent color come from
+      Settings (not hardcoded)
+- [ ] Changing Settings updates the next PDF output
+- [ ] Global search returns relevant products and customers (and
+      quotations if implemented)
+- [ ] Data persists after application restart
+- [ ] Backend validation rejects invalid quotations (missing customer,
+      zero quantity, etc.)
+- [ ] UI shows validation and error states clearly
+- [ ] No secrets committed to the repository
+- [ ] README setup instructions work on a clean machine
+- [ ] Mandatory xUnit tests pass
+
+For each item, mark [x] if genuinely implemented and verified (based on
+what's actually in this codebase and what was manually tested during
+development), or leave [ ] with a brief note if not done or only
+partially done. Do not mark something [x] unless there is real evidence
+it works (e.g. was tested in this session's history).
+
+## Validation
+List the specific validation rules actually implemented (e.g. quantity
+> 0, customer must belong to company, product must belong to company).
+
+## Error Handling
+List the specific error/failure states actually implemented (e.g.
+ServiceResult failure messages, [Authorize] redirects).
+
+## Testing
+List what's actually tested (the 2 mandatory xUnit tests) and what
+isn't (integration tests, edge cases) — be honest about gaps.
+
+## Documentation
+List which lifecycle documents are complete as of this point.
+
+**Response summary:**
+Cursor cross-referenced all 15 Core acceptance criteria against
+controllers, views, Application/Infrastructure services, EF Core
+migrations, xUnit tests, debugging-notes.md, ai-prompts/planning.md
+manual verification notes, and test-results.md. Generated
+acceptance-criteria.md at the repository root with all five sections.
+Each Core checklist item was manually reviewed against actual testing
+evidence (planning prompts #6–#13, debugging-notes Issues 1–6,
+test-results.md, and a fresh dotnet test run confirming 2/2 passing)
+before being marked [x]; items include per-criterion evidence notes
+where verification was manual vs automated. Validation section lists
+rules from QuotationService, view-model annotations, SearchService, and
+Identity. Error Handling section documents ServiceResult, ModelState,
+NotFound, Challenge, and Error view patterns. Testing section lists the
+two mandatory xUnit tests and honest gaps (no integration tests,
+validation rejection paths untested). Documentation section lists all
+complete lifecycle documents and notes test-strategy.md is referenced
+but missing.
+
+**Accepted / Changed / Rejected:**
+- Accepted: acceptance-criteria.md added at repo root with all five
+  sections; each Core item reviewed against evidence before marking
+  complete.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add acceptance-criteria.md cross-referencing Core criteria against implementation (prompt #14 entry)"
+
