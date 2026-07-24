@@ -432,3 +432,53 @@ data-model.md, and api-contract.md.
 
 **Commit:** "Add design-notes.md covering architecture and design patterns (prompt #12 entry)"
 
+
+## Prompt #13 — Generate ui-flow.md
+**Date:** 2026-07-24
+
+**Prompt:**
+Based on the actual pages and navigation in SmeErp.Web (Login,
+Dashboard, Products, Customers, Quotations Index/Create/Details,
+Settings, Search), draft ui-flow.md covering:
+
+1. An overview of the navigation structure (top nav links, what's
+   visible only to authenticated users).
+2. The login flow: unauthenticated user -> Login page -> Dashboard on
+   success.
+3. For each major page, a brief flow description: how the user gets
+   there, what they can do, where actions lead (e.g. Quotations Index
+   -> click "New Quotation" -> Create form -> submit -> redirects to
+   Details page; Details page -> "Download PDF" -> streams PDF file).
+4. The Global Search flow: search box in nav -> results page grouped
+   by type -> click a result -> navigates to relevant page.
+5. Note where multi-tenant scoping affects what a user sees (e.g. two
+   different users see completely different Products/Customers/
+   Quotations lists based on their company).
+
+Keep this as a clear, readable flow description (numbered steps or
+simple arrows are fine) rather than requiring an actual diagram image.
+Base it strictly on real pages/actions that exist in the codebase.
+
+**Response summary:**
+Cursor read _Layout.cshtml (navbar links, search form, sign-in/sign-out),
+and the Razor views for Login, Dashboard, Products, Customers, Quotations
+(Index/Create/Details), Settings, and Search, plus controller redirect
+behavior. Generated ui-flow.md at the repository root covering all five
+requested sections: navigation structure (authenticated vs unauthenticated
+items, pages not in main nav), login and logout flows, per-page flow
+descriptions with arrival paths and action outcomes (including quotation
+create → details → PDF download and settings save redirect), global search
+flow (keyword length rules, grouped results, destination URLs from
+SearchService), and multi-tenant scoping with a Sharma vs Verma seeded-
+data example. Added an end-to-end quotation walkthrough and links to
+related documentation. Used numbered steps and arrow flows only — no
+diagram image.
+
+**Accepted / Changed / Rejected:**
+- Accepted: ui-flow.md added at repo root with all five sections in the
+  correct format.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add ui-flow.md documenting page navigation and user flows (prompt #13 entry)"
+
