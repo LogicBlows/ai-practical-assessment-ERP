@@ -761,3 +761,81 @@ which previously pointed to a missing test-strategy.md file.
 
 **Commit:** "Add test-strategy.md documenting test scope and coverage gaps (prompt #17 entry)"
 
+
+## Prompt #18 — Generate code-review-notes.md and review-fixes.md
+**Date:** 2026-07-24
+
+**Prompt:**
+Based on the actual bugs found and fixed during this project (see
+debugging-notes.md Issues 1-6), and the pattern of reviewing Cursor's
+generated code before committing (checking diffs, verifying against
+manual testing, catching incomplete work), draft two files:
+
+code-review-notes.md:
+
+## AI-Assisted Review Summary
+Describe the actual review process used throughout: after each Cursor
+prompt, code was reviewed for (a) architectural compliance (no
+DbContext in controllers, ServiceResult<T> pattern followed), (b)
+correctness against manually verified data/calculations, and (c)
+completeness (checking the database directly rather than trusting a
+"success" message, which caught several under-delivered prompts).
+
+## My Review Observations
+List specific real observations made during review: Cursor initially
+seeded only Company data when four entity types were requested
+(caught via SSMS inspection); Cursor used Task.WhenAll against a
+shared DbContext in two separate features (SearchService and
+DashboardService), a pattern that should have been avoided from a
+correctness standpoint; a DI registration was missing for
+IQuotationPdfService, breaking an entire controller; a font library
+default caused silent character corruption in generated PDFs.
+
+## Changes Made After Review
+List the actual fixes applied: added missing seed data for Product/
+Customer/CompanySetting; replaced Task.WhenAll with sequential awaits
+in both SearchService and DashboardService; added the missing
+AddScoped registration for IQuotationPdfService in Program.cs; set an
+explicit FontFamily and disabled standard ligatures in
+QuotationPdfService.
+
+## Suggestions Rejected (and why)
+Describe any Cursor suggestions or defaults not accepted: kept MVC
+controllers instead of adding a separate Web API project (assessed as
+unnecessary scope for Core requirements); did not implement public
+self-service tenant registration despite initial interest, since it
+exceeded Core/Stretch scope and would have displaced time needed for
+lifecycle documentation.
+
+review-fixes.md:
+
+For each fix listed above, document: what was found, where in the
+repo it was fixed (reference the actual commit messages, e.g. "Add
+Global Search with DbContext concurrency and DI registration fixes"),
+and how it was verified afterward (re-running the feature manually,
+re-checking cross-tenant isolation).
+
+**Response summary:**
+Cursor read debugging-notes.md (Issues 1–6), ai-prompts/planning.md,
+and Git commit history. Generated code-review-notes.md and
+review-fixes.md at the repository root. code-review-notes.md covers
+the three-part review process (architectural compliance, manual
+correctness verification, SSMS/database completeness checks), six
+specific review observations, five code fixes applied after review,
+and rejected suggestions (no separate Web API, no self-service
+registration, no parallel Task.WhenAll, no default QuestPDF font).
+review-fixes.md documents each fix with what was found, commit hash
+and message (226516f seed data; 7c20d79 search/dashboard concurrency
+and DI registration; 8e2f3b5 PDF font fix), affected files, and
+verification steps including cross-tenant isolation checks; also notes
+environmental Issues 1–2 (stale dotnet processes). Both files
+cross-reference debugging-notes.md and each other.
+
+**Accepted / Changed / Rejected:**
+- Accepted: code-review-notes.md and review-fixes.md added at repo
+  root with all requested sections in the correct format.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add code-review-notes.md and review-fixes.md documenting review process and fixes (prompt #18 entry)"
+
