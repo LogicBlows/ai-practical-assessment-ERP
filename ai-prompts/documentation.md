@@ -839,3 +839,67 @@ cross-reference debugging-notes.md and each other.
 
 **Commit:** "Add code-review-notes.md and review-fixes.md documenting review process and fixes (prompt #18 entry)"
 
+
+## Prompt #19 — Generate pr-description.md (consolidating 7 merged PRs)
+**Date:** 2026-07-24
+
+**Prompt:**
+Compile pr-description.md at the repo root, consolidating all 7 merged
+pull requests into one document following this structure:
+
+# PR Description
+
+## Overview
+Brief summary noting this project was built across 7 sequential
+feature branches/PRs, each independently tested and verified before
+merge: authentication & roles, products & customers, quotations,
+settings & PDF, UI styling, search & dashboard, and mandatory tests.
+
+Then, for each of the 7 merged PRs (read the actual PR descriptions
+from the GitHub repository's closed/merged pull requests, or
+reconstruct from the corresponding commit messages and
+ai-prompts/planning.md entries if PR descriptions aren't directly
+accessible), include:
+
+## PR #[N]: [Title]
+- Summary
+- Features Implemented
+- Technical Changes
+- Testing Done
+- Known Limitations
+
+Cover, in order: (1) Add authentication, roles, and DB-stored JWT
+signing key, (2) Add Products and Customers list/search pages, (3) Add
+Quotation creation, list, and detail flow, (4) Add Company Settings
+page and Quotation PDF generation, (5) Apply Bootswatch theme and
+card-based UI styling, (6) Add Global Search and Dashboard KPI cards,
+(7) Add mandatory xUnit tests.
+
+Base content on what was actually built, tested, and documented in
+each corresponding phase — do not invent details not already recorded
+in ai-prompts/planning.md or debugging-notes.md.
+
+**Response summary:**
+Cursor attempted to read merged PR descriptions via GitHub CLI (gh
+unavailable); reconstructed pr-description.md from Git merge commits,
+branch names, ai-prompts/planning.md (Prompts #6–#14), debugging-notes.md,
+and test-results.md. Generated pr-description.md at the repository root
+with overview table and seven PR sections (Summary, Features Implemented,
+Technical Changes, Testing Done, Known Limitations each). The branch/PR/
+merge-commit mapping was verified against actual Git history for accuracy:
+PR #1 feature/auth-and-roles (fa40b17), #2 feature/products-customers
+(282a878), #3 feature/quotations (c8f1781), #4 feature/settings-and-pdf
+(7251878), #5 feature/ui-styling (09188b5), #6 feature/search-and-dashboard
+(84d1460), #7 feature/tests (83c3451). Documented cross-PR fixes (DI
+registration, DbContext concurrency, PDF font) and post-merge lifecycle
+documentation. Content limited to recorded planning and debugging evidence.
+
+**Accepted / Changed / Rejected:**
+- Accepted: pr-description.md added at repo root consolidating all
+  seven merged PRs in the correct format; branch/PR mapping verified
+  against Git history.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add pr-description.md consolidating seven merged feature PRs (prompt #19 entry)"
+
