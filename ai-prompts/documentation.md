@@ -377,3 +377,58 @@ against actual controller code for accuracy.
 
 **Commit:** "Add api-contract.md documenting MVC controller actions (prompt #11 entry)"
 
+
+## Prompt #12 — Generate design-notes.md
+**Date:** 2026-07-24
+
+**Prompt:**
+Based on the current solution structure (Clean Architecture layers:
+Domain, Application, Infrastructure, Shared, Web), the multi-tenant
+CompanyId pattern, ASP.NET Identity setup, the DB-stored JWT signing
+key service, and the QuestPDF/Settings integration, draft
+design-notes.md covering:
+
+1. Architecture Overview — the 5-layer structure and why (separation
+   of concerns, no business logic in controllers/views, no direct
+   DbContext access outside Infrastructure).
+2. Frontend Design — Razor MVC with Bootswatch theming, PrimaryColor
+   driven from company settings.
+3. Backend Design — Application-layer services returning ServiceResult<T>,
+   controllers as thin orchestrators.
+4. Database Design — SQL Server via EF Core, multi-tenant isolation via
+   CompanyId, indexing strategy.
+5. Validation Strategy — where validation happens (Application layer
+   services, not controllers or views).
+6. Error Handling Strategy — how failures are surfaced (ServiceResult
+   failure messages, ModelState errors, NotFound/Challenge/Error view
+   responses, and UseExceptionHandler for unhandled exceptions).
+
+Base this strictly on the actual solution structure and patterns in the
+codebase — do not invent architectural decisions that don't exist.
+
+**Response summary:**
+Cursor read the solution structure, ServiceResult<T> pattern, controllers,
+view models, CompanyBrandingViewComponent, Program.cs (Identity, DI,
+exception handler), SigningKeyService/Seeder, QuotationPdfService, and
+Infrastructure service implementations. Generated design-notes.md at the
+repository root covering all six requested sections: architecture overview
+(five-layer Clean Architecture, dependency direction, DbContext isolation,
+Identity and signing-key current state), frontend design (Razor MVC,
+Bootswatch Flatly, PrimaryColor-driven navbar and PDF branding via
+CompanyBrandingViewComponent), backend design (service interfaces,
+ServiceResult<T>, thin controllers, DTO/view-model split), database design
+(EF Core, CompanyId multi-tenancy, indexing, delete behaviors, seed
+strategy), validation strategy (business rules in services, data
+annotations on view models, QuotationTotalsCalculator), and error handling
+(ServiceResult failure paths, controller response mapping, exception
+handler). Added a key integration points table and links to README.md,
+data-model.md, and api-contract.md.
+
+**Accepted / Changed / Rejected:**
+- Accepted: design-notes.md added at repo root with all six sections in
+  the correct format.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add design-notes.md covering architecture and design patterns (prompt #12 entry)"
+
