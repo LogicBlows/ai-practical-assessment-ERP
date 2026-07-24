@@ -696,3 +696,68 @@ listed separately.
 
 **Commit:** "Add implementation-plan.md documenting build sequence and milestones (prompt #16 entry)"
 
+
+## Prompt #17 — Generate test-strategy.md
+**Date:** 2026-07-24
+
+**Prompt:**
+Based on the actual test implemented (SmeErp.Application.Tests) and
+the project's testing history (test-results.md, debugging-notes.md),
+draft test-strategy.md covering:
+
+## Test Scope
+What is covered by testing in this project: quotation calculation
+correctness, settings-defaults behavior. What is NOT covered:
+integration/end-to-end tests, UI tests, load/performance tests.
+
+## Unit Tests
+Describe the two mandatory unit tests actually implemented: the
+quotation calculation test (isolated from EF Core via
+QuotationTotalsCalculator) and the settings defaults test.
+
+## Component Tests
+State honestly that no component-level tests exist for controllers or
+views in this project (Core scope did not require this).
+
+## API / Integration Tests
+State honestly that no integration tests using WebApplicationFactory or
+similar exist yet — note this is listed as Stretch in the assessment
+requirements, not required for Core.
+
+## Edge Case Tests
+List edge cases considered but not automated: quotation with
+zero-quantity line items (rejected by validation, tested manually not
+via automated test), cross-tenant data access (verified manually across
+every feature via SSMS/UI, not via automated integration test).
+
+## Tests Not Covered (and why)
+Be explicit and honest: authentication flow, role-based authorization,
+cross-tenant isolation, PDF generation correctness, and search/dashboard
+concurrency behavior were all verified through manual testing during
+development (documented in debugging-notes.md) but are not covered by
+automated tests. This reflects the trimmed Core scope's 8-12 hour time
+budget, with the mandatory test tier satisfied and remaining time
+allocated to lifecycle documentation as prioritized by the assessment
+guidelines.
+
+**Response summary:**
+Cursor read SmeErp.Application.Tests (QuotationCalculationTests,
+CompanySettingsDefaultsTests), QuotationTotalsCalculator, test-results.md
+(2/2 passing), and debugging-notes.md. Generated test-strategy.md at the
+repository root covering all six sections: test scope (two automated areas
+vs explicit gaps), detailed descriptions of both mandatory unit tests,
+honest statements that no component or integration tests exist (Stretch
+tier), edge cases table distinguishing automated vs manual verification,
+and Tests Not Covered with rationale (8–12 hour Core budget, mandatory
+tier satisfied, manual verification documented in planning.md and
+debugging-notes.md). Resolves the forward reference in test-results.md,
+which previously pointed to a missing test-strategy.md file.
+
+**Accepted / Changed / Rejected:**
+- Accepted: test-strategy.md added at repo root with all six sections
+  in the correct format.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add test-strategy.md documenting test scope and coverage gaps (prompt #17 entry)"
+
