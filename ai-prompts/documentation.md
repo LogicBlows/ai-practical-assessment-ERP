@@ -266,3 +266,62 @@ was recorded in ai-prompts/documentation.md as Prompt #8.
 
 **Commit:** "Document mandatory xUnit tests in planning.md (prompt #14 entry)"
 
+
+## Prompt #9 — Generate README.md
+**Date:** 2026-07-24
+
+**Prompt:**
+Read the entire codebase (src/ structure, Program.cs, appsettings.json,
+migrations) and generate a README.md at the repo root covering:
+
+1. Project overview — one paragraph describing what SmeErp is (small
+   business ERP: products, customers, quotations, PDF generation,
+   multi-tenant).
+2. Tech stack — .NET 6, EF Core 6, SQL Server, Razor MVC, ASP.NET
+   Identity, QuestPDF.
+3. Prerequisites — .NET 6 SDK, SQL Server (Express or full instance),
+   dotnet-ef tool.
+4. Setup instructions, step by step:
+   - Clone the repo
+   - Update the connection string in src/SmeErp.Web/appsettings.json
+     (explain the format, no real credentials, just a placeholder like
+     "Server=YOUR_SERVER;Database=SmeErpDb;Trusted_Connection=True;TrustServerCertificate=True;")
+   - Run `dotnet ef database update --project src/SmeErp.Infrastructure --startup-project src/SmeErp.Web`
+   - Run `dotnet run` from src/SmeErp.Web
+   - Navigate to the printed localhost URL
+5. Seeded login credentials for both demo companies (email/password for
+   admin@sharmatrading.com and admin@vermadist.com — note clearly this
+   password is a placeholder for local/demo use only).
+6. Running tests — `dotnet test` from repo root.
+7. Project structure — brief description of the Clean Architecture
+   layers (Domain/Application/Infrastructure/Shared/Web) and what lives
+   in each.
+8. Key features list (multi-tenant isolation, quotation PDF generation,
+   settings-driven branding, global search, dashboard KPIs).
+
+Keep it factual and based only on what's actually in the codebase —
+don't invent features or steps that don't exist.
+
+**Response summary:**
+Cursor read the codebase (src/ structure, Program.cs, appsettings.json,
+migrations, IdentitySeeder, launchSettings.json, solution layout, and
+test project) and generated README.md at the repository root covering
+all eight requested sections: project overview, tech stack table,
+prerequisites, step-by-step setup (connection string placeholder,
+`dotnet ef database update`, `dotnet run`, localhost URLs), demo login
+credentials for both seeded companies with a local/demo-only password
+warning, `dotnet test` instructions, Clean Architecture project
+structure, and a key-features list limited to implemented functionality.
+The README's setup instructions were manually followed step by step on a
+fresh check (connection string placeholder, migration command, `dotnet
+run`, login with seeded credentials exactly as documented, and `dotnet
+test` from repo root) and confirmed to work correctly as written.
+
+**Accepted / Changed / Rejected:**
+- Accepted: README.md added at repo root with all eight sections in the
+  correct format; setup steps verified manually on a fresh check.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add README.md with setup instructions and project overview (prompt #9 entry)"
+
