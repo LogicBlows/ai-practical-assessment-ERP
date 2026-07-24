@@ -266,3 +266,640 @@ was recorded in ai-prompts/documentation.md as Prompt #8.
 
 **Commit:** "Document mandatory xUnit tests in planning.md (prompt #14 entry)"
 
+
+## Prompt #9 — Generate README.md
+**Date:** 2026-07-24
+
+**Prompt:**
+Read the entire codebase (src/ structure, Program.cs, appsettings.json,
+migrations) and generate a README.md at the repo root covering:
+
+1. Project overview — one paragraph describing what SmeErp is (small
+   business ERP: products, customers, quotations, PDF generation,
+   multi-tenant).
+2. Tech stack — .NET 6, EF Core 6, SQL Server, Razor MVC, ASP.NET
+   Identity, QuestPDF.
+3. Prerequisites — .NET 6 SDK, SQL Server (Express or full instance),
+   dotnet-ef tool.
+4. Setup instructions, step by step:
+   - Clone the repo
+   - Update the connection string in src/SmeErp.Web/appsettings.json
+     (explain the format, no real credentials, just a placeholder like
+     "Server=YOUR_SERVER;Database=SmeErpDb;Trusted_Connection=True;TrustServerCertificate=True;")
+   - Run `dotnet ef database update --project src/SmeErp.Infrastructure --startup-project src/SmeErp.Web`
+   - Run `dotnet run` from src/SmeErp.Web
+   - Navigate to the printed localhost URL
+5. Seeded login credentials for both demo companies (email/password for
+   admin@sharmatrading.com and admin@vermadist.com — note clearly this
+   password is a placeholder for local/demo use only).
+6. Running tests — `dotnet test` from repo root.
+7. Project structure — brief description of the Clean Architecture
+   layers (Domain/Application/Infrastructure/Shared/Web) and what lives
+   in each.
+8. Key features list (multi-tenant isolation, quotation PDF generation,
+   settings-driven branding, global search, dashboard KPIs).
+
+Keep it factual and based only on what's actually in the codebase —
+don't invent features or steps that don't exist.
+
+**Response summary:**
+Cursor read the codebase (src/ structure, Program.cs, appsettings.json,
+migrations, IdentitySeeder, launchSettings.json, solution layout, and
+test project) and generated README.md at the repository root covering
+all eight requested sections: project overview, tech stack table,
+prerequisites, step-by-step setup (connection string placeholder,
+`dotnet ef database update`, `dotnet run`, localhost URLs), demo login
+credentials for both seeded companies with a local/demo-only password
+warning, `dotnet test` instructions, Clean Architecture project
+structure, and a key-features list limited to implemented functionality.
+The README's setup instructions were manually followed step by step on a
+fresh check (connection string placeholder, migration command, `dotnet
+run`, login with seeded credentials exactly as documented, and `dotnet
+test` from repo root) and confirmed to work correctly as written.
+
+**Accepted / Changed / Rejected:**
+- Accepted: README.md added at repo root with all eight sections in the
+  correct format; setup steps verified manually on a fresh check.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add README.md with setup instructions and project overview (prompt #9 entry)"
+
+
+## Prompt #11 — Generate api-contract.md
+**Date:** 2026-07-24
+
+**Prompt:**
+Read the controllers currently implemented in SmeErp.Web/Controllers
+(AccountController, DashboardController, ProductsController,
+CustomersController, QuotationsController, SettingsController,
+SearchController) and the Application-layer services they call. Draft
+api-contract.md documenting each controller action as an endpoint:
+
+1. Route and HTTP method
+2. Purpose (one sentence)
+3. Request inputs (query params, form fields, route params)
+4. Response/redirect behavior
+5. Authorization requirements ([Authorize] and any role restrictions)
+6. Validation rules enforced
+
+Group by controller. Note explicitly that this project uses MVC
+controllers rather than a separate REST API, so "endpoints" here refer
+to MVC actions rendering Razor views or redirecting, not JSON responses
+(except where noted, e.g. if any AJAX endpoints exist).
+
+Base this strictly on the actual controller definitions and
+Application-layer services in the codebase — do not invent endpoints or
+behaviors that don't exist.
+
+**Response summary:**
+Cursor read all seven controllers in SmeErp.Web/Controllers, their
+view models (LoginViewModel, CreateQuotationViewModel,
+CompanySettingsViewModel), and the Application-layer services they call
+(IDashboardService, IProductService, ICustomerService, IQuotationService,
+ICompanySettingsService, IQuotationPdfService, ISearchService,
+ICurrentCompanyService). Generated api-contract.md at the repository
+root documenting 15 MVC actions grouped by controller, each with route,
+HTTP method, purpose, inputs, response/redirect behavior, authorization,
+and validation rules (controller, data annotations, and service layer).
+The document explicitly states the project uses MVC rather than a REST
+API, notes no JSON/AJAX endpoints exist, identifies DownloadPdf as the
+only non-HTML response (PDF file download), and records that no role-
+based restrictions are enforced beyond [Authorize]. Content was checked
+against actual controller code for accuracy.
+
+**Accepted / Changed / Rejected:**
+- Accepted: api-contract.md added at repo root with all seven controllers
+  documented in the correct format; content verified against controller
+  source.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add api-contract.md documenting MVC controller actions (prompt #11 entry)"
+
+
+## Prompt #12 — Generate design-notes.md
+**Date:** 2026-07-24
+
+**Prompt:**
+Based on the current solution structure (Clean Architecture layers:
+Domain, Application, Infrastructure, Shared, Web), the multi-tenant
+CompanyId pattern, ASP.NET Identity setup, the DB-stored JWT signing
+key service, and the QuestPDF/Settings integration, draft
+design-notes.md covering:
+
+1. Architecture Overview — the 5-layer structure and why (separation
+   of concerns, no business logic in controllers/views, no direct
+   DbContext access outside Infrastructure).
+2. Frontend Design — Razor MVC with Bootswatch theming, PrimaryColor
+   driven from company settings.
+3. Backend Design — Application-layer services returning ServiceResult<T>,
+   controllers as thin orchestrators.
+4. Database Design — SQL Server via EF Core, multi-tenant isolation via
+   CompanyId, indexing strategy.
+5. Validation Strategy — where validation happens (Application layer
+   services, not controllers or views).
+6. Error Handling Strategy — how failures are surfaced (ServiceResult
+   failure messages, ModelState errors, NotFound/Challenge/Error view
+   responses, and UseExceptionHandler for unhandled exceptions).
+
+Base this strictly on the actual solution structure and patterns in the
+codebase — do not invent architectural decisions that don't exist.
+
+**Response summary:**
+Cursor read the solution structure, ServiceResult<T> pattern, controllers,
+view models, CompanyBrandingViewComponent, Program.cs (Identity, DI,
+exception handler), SigningKeyService/Seeder, QuotationPdfService, and
+Infrastructure service implementations. Generated design-notes.md at the
+repository root covering all six requested sections: architecture overview
+(five-layer Clean Architecture, dependency direction, DbContext isolation,
+Identity and signing-key current state), frontend design (Razor MVC,
+Bootswatch Flatly, PrimaryColor-driven navbar and PDF branding via
+CompanyBrandingViewComponent), backend design (service interfaces,
+ServiceResult<T>, thin controllers, DTO/view-model split), database design
+(EF Core, CompanyId multi-tenancy, indexing, delete behaviors, seed
+strategy), validation strategy (business rules in services, data
+annotations on view models, QuotationTotalsCalculator), and error handling
+(ServiceResult failure paths, controller response mapping, exception
+handler). Added a key integration points table and links to README.md,
+data-model.md, and api-contract.md.
+
+**Accepted / Changed / Rejected:**
+- Accepted: design-notes.md added at repo root with all six sections in
+  the correct format.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add design-notes.md covering architecture and design patterns (prompt #12 entry)"
+
+
+## Prompt #13 — Generate ui-flow.md
+**Date:** 2026-07-24
+
+**Prompt:**
+Based on the actual pages and navigation in SmeErp.Web (Login,
+Dashboard, Products, Customers, Quotations Index/Create/Details,
+Settings, Search), draft ui-flow.md covering:
+
+1. An overview of the navigation structure (top nav links, what's
+   visible only to authenticated users).
+2. The login flow: unauthenticated user -> Login page -> Dashboard on
+   success.
+3. For each major page, a brief flow description: how the user gets
+   there, what they can do, where actions lead (e.g. Quotations Index
+   -> click "New Quotation" -> Create form -> submit -> redirects to
+   Details page; Details page -> "Download PDF" -> streams PDF file).
+4. The Global Search flow: search box in nav -> results page grouped
+   by type -> click a result -> navigates to relevant page.
+5. Note where multi-tenant scoping affects what a user sees (e.g. two
+   different users see completely different Products/Customers/
+   Quotations lists based on their company).
+
+Keep this as a clear, readable flow description (numbered steps or
+simple arrows are fine) rather than requiring an actual diagram image.
+Base it strictly on real pages/actions that exist in the codebase.
+
+**Response summary:**
+Cursor read _Layout.cshtml (navbar links, search form, sign-in/sign-out),
+and the Razor views for Login, Dashboard, Products, Customers, Quotations
+(Index/Create/Details), Settings, and Search, plus controller redirect
+behavior. Generated ui-flow.md at the repository root covering all five
+requested sections: navigation structure (authenticated vs unauthenticated
+items, pages not in main nav), login and logout flows, per-page flow
+descriptions with arrival paths and action outcomes (including quotation
+create → details → PDF download and settings save redirect), global search
+flow (keyword length rules, grouped results, destination URLs from
+SearchService), and multi-tenant scoping with a Sharma vs Verma seeded-
+data example. Added an end-to-end quotation walkthrough and links to
+related documentation. Used numbered steps and arrow flows only — no
+diagram image.
+
+**Accepted / Changed / Rejected:**
+- Accepted: ui-flow.md added at repo root with all five sections in the
+  correct format.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add ui-flow.md documenting page navigation and user flows (prompt #13 entry)"
+
+
+## Prompt #14 — Generate acceptance-criteria.md
+**Date:** 2026-07-24
+
+**Prompt:**
+Read the Core Acceptance Criteria for Option 3 (.NET Full-Stack — SME
+ERP) from the assessment requirements, and cross-reference each item
+against what has actually been implemented and verified in this
+codebase (controllers, views, tests, migrations, debugging-notes.md).
+
+Draft acceptance-criteria.md as a checklist matching this exact
+structure:
+
+## Core
+- [ ] A user can log in with seeded credentials
+- [ ] A user can list and search products from the database
+- [ ] A user can list customers from the database
+- [ ] A user can create a quotation with multiple line items via the UI
+- [ ] A user can view the quotation list and open a detail view
+- [ ] A user can download/print a quotation PDF
+- [ ] PDF company address, GSTIN, terms, and accent color come from
+      Settings (not hardcoded)
+- [ ] Changing Settings updates the next PDF output
+- [ ] Global search returns relevant products and customers (and
+      quotations if implemented)
+- [ ] Data persists after application restart
+- [ ] Backend validation rejects invalid quotations (missing customer,
+      zero quantity, etc.)
+- [ ] UI shows validation and error states clearly
+- [ ] No secrets committed to the repository
+- [ ] README setup instructions work on a clean machine
+- [ ] Mandatory xUnit tests pass
+
+For each item, mark [x] if genuinely implemented and verified (based on
+what's actually in this codebase and what was manually tested during
+development), or leave [ ] with a brief note if not done or only
+partially done. Do not mark something [x] unless there is real evidence
+it works (e.g. was tested in this session's history).
+
+## Validation
+List the specific validation rules actually implemented (e.g. quantity
+> 0, customer must belong to company, product must belong to company).
+
+## Error Handling
+List the specific error/failure states actually implemented (e.g.
+ServiceResult failure messages, [Authorize] redirects).
+
+## Testing
+List what's actually tested (the 2 mandatory xUnit tests) and what
+isn't (integration tests, edge cases) — be honest about gaps.
+
+## Documentation
+List which lifecycle documents are complete as of this point.
+
+**Response summary:**
+Cursor cross-referenced all 15 Core acceptance criteria against
+controllers, views, Application/Infrastructure services, EF Core
+migrations, xUnit tests, debugging-notes.md, ai-prompts/planning.md
+manual verification notes, and test-results.md. Generated
+acceptance-criteria.md at the repository root with all five sections.
+Each Core checklist item was manually reviewed against actual testing
+evidence (planning prompts #6–#13, debugging-notes Issues 1–6,
+test-results.md, and a fresh dotnet test run confirming 2/2 passing)
+before being marked [x]; items include per-criterion evidence notes
+where verification was manual vs automated. Validation section lists
+rules from QuotationService, view-model annotations, SearchService, and
+Identity. Error Handling section documents ServiceResult, ModelState,
+NotFound, Challenge, and Error view patterns. Testing section lists the
+two mandatory xUnit tests and honest gaps (no integration tests,
+validation rejection paths untested). Documentation section lists all
+complete lifecycle documents and notes test-strategy.md is referenced
+but missing.
+
+**Accepted / Changed / Rejected:**
+- Accepted: acceptance-criteria.md added at repo root with all five
+  sections; each Core item reviewed against evidence before marking
+  complete.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add acceptance-criteria.md cross-referencing Core criteria against implementation (prompt #14 entry)"
+
+
+## Prompt #15 — Generate requirements-analysis.md
+**Date:** 2026-07-24
+
+**Prompt:**
+Draft requirements-analysis.md for the SmeErp project (Option 3: .NET
+Full-Stack SME ERP), covering:
+
+## Selected Project Option
+.NET Full-Stack — SME ERP (Inventory Management)
+
+## My Understanding
+[Leave this section as a placeholder marked "TO BE FILLED IN BY
+DEVELOPER" — this needs to be written in the developer's own words,
+not generated]
+
+## Functional Requirements
+List the actual functional requirements as implemented: authentication,
+multi-tenant company isolation, product/customer list+search,
+quotation creation with line-item calculation, quotation PDF
+generation, company settings management, global search, dashboard KPIs.
+
+## Non-Functional Requirements
+Based on what was actually built: data isolation between tenants,
+no secrets in source control, responsive validation, calculation
+correctness (verified via manual hand-calculation and unit tests).
+
+## Assumptions
+List assumptions actually made during development: one user per
+company (no multi-user-per-company support), no self-service tenant
+registration (companies/users are seeded by the developer), single
+role tier per company (Proprietor) is sufficient for Core scope.
+
+## Clarifications (questions for a product owner)
+List 2-3 realistic open questions this project would raise for a real
+product owner (e.g. should multiple users per company be supported?
+should quotations be editable after creation? should there be an
+approval workflow before a quotation is finalized?).
+
+## Edge Cases
+List edge cases actually handled or considered: company with no
+settings yet (defaults), quotation with zero line items (rejected),
+customer/product belonging to a different company (rejected),
+duplicate signing key generation on startup (guarded against).
+
+**Response summary:**
+Cursor generated requirements-analysis.md at the repository root
+covering all seven sections: selected project option, functional
+requirements (all implemented Core features), non-functional
+requirements (tenant isolation, no secrets, validation, calculation
+correctness), development assumptions, three product-owner clarification
+questions, and edge cases handled in the codebase (with references to
+services, tests, and debugging-notes.md). The "My Understanding"
+section was left as an explicit placeholder ("TO BE FILLED IN BY
+DEVELOPER") for the developer to complete personally in their own
+words — not AI-generated. Added links to related lifecycle documents.
+
+**Accepted / Changed / Rejected:**
+- Accepted: requirements-analysis.md added at repo root with all
+  sections except "My Understanding", which remains a developer-
+  written placeholder.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add requirements-analysis.md for Option 3 SME ERP scope (prompt #15 entry)"
+
+
+## Prompt #16 — Generate implementation-plan.md
+**Date:** 2026-07-24
+
+**Prompt:**
+Based on the actual sequence of work done in this project (visible in
+ai-prompts/planning.md and the Git commit history), draft
+implementation-plan.md covering:
+
+## Overview
+Brief summary of the build approach: incremental, one feature per
+branch/PR, with manual verification before each merge.
+
+## Task Breakdown
+List the actual sequence of work completed, in order: solution
+scaffold, domain entities, DbContext/migrations, seed data,
+authentication/roles/current-company resolution, DB-stored JWT signing
+key, Products/Customers list+search, Quotation creation/list/detail,
+Company Settings + PDF generation, UI styling pass, Global Search,
+Dashboard KPIs, mandatory xUnit tests.
+
+## Milestones
+Group the above into logical milestones (e.g. "Foundation" =
+scaffold+entities+DB+seed; "Auth & Multi-tenancy" = auth+roles+signing
+key; "Core Business Features" = products/customers/quotations/settings/
+PDF; "Polish & Verification" = styling/search/dashboard/tests).
+
+## AI Usage Plan
+Describe the actual prompting approach used: one scoped prompt per
+feature, explicit architectural constraints given upfront in the first
+prompt, manual verification (running the app, checking SSMS, hand-
+calculating totals) before accepting any feature as complete, and
+documentation generated via Cursor but reviewed/edited before commit.
+
+## Risks
+List real risks that were relevant during development: DbContext
+concurrency issues with parallel async calls (which actually
+materialized twice — see debugging-notes.md Issues 4 and 6), missing
+DI registrations causing silent controller failures, font rendering
+issues in generated PDFs, incomplete AI deliverables requiring follow-up
+prompts, and stale dotnet processes blocking builds.
+
+**Response summary:**
+Cursor read ai-prompts/planning.md (Prompts #1–#14), Git commit history
+(chronological log and feature branch PRs #1–#7), and debugging-notes.md
+(Issues 1–6). Generated implementation-plan.md at the repository root
+covering all five sections: overview (incremental one-feature-per-PR
+approach with manual verification), task breakdown table mapping each
+prompt to commits and PR branches, four milestones (Foundation, Auth &
+Multi-Tenancy, Core Business Features, Polish & Verification), AI usage
+plan (fixed constraints in Prompt #1, scoped prompts, verification
+checklist, reviewed documentation), and risks table documenting issues
+that materialized (DbContext concurrency in SearchService and
+DashboardService, missing IQuotationPdfService DI registration, QuestPDF
+font ligature corruption, incomplete Prompt #4 seed data, stale dotnet
+processes) plus future risks noted. Post-Core documentation commits
+listed separately.
+
+**Accepted / Changed / Rejected:**
+- Accepted: implementation-plan.md added at repo root with all five
+  sections in the correct format.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add implementation-plan.md documenting build sequence and milestones (prompt #16 entry)"
+
+
+## Prompt #17 — Generate test-strategy.md
+**Date:** 2026-07-24
+
+**Prompt:**
+Based on the actual test implemented (SmeErp.Application.Tests) and
+the project's testing history (test-results.md, debugging-notes.md),
+draft test-strategy.md covering:
+
+## Test Scope
+What is covered by testing in this project: quotation calculation
+correctness, settings-defaults behavior. What is NOT covered:
+integration/end-to-end tests, UI tests, load/performance tests.
+
+## Unit Tests
+Describe the two mandatory unit tests actually implemented: the
+quotation calculation test (isolated from EF Core via
+QuotationTotalsCalculator) and the settings defaults test.
+
+## Component Tests
+State honestly that no component-level tests exist for controllers or
+views in this project (Core scope did not require this).
+
+## API / Integration Tests
+State honestly that no integration tests using WebApplicationFactory or
+similar exist yet — note this is listed as Stretch in the assessment
+requirements, not required for Core.
+
+## Edge Case Tests
+List edge cases considered but not automated: quotation with
+zero-quantity line items (rejected by validation, tested manually not
+via automated test), cross-tenant data access (verified manually across
+every feature via SSMS/UI, not via automated integration test).
+
+## Tests Not Covered (and why)
+Be explicit and honest: authentication flow, role-based authorization,
+cross-tenant isolation, PDF generation correctness, and search/dashboard
+concurrency behavior were all verified through manual testing during
+development (documented in debugging-notes.md) but are not covered by
+automated tests. This reflects the trimmed Core scope's 8-12 hour time
+budget, with the mandatory test tier satisfied and remaining time
+allocated to lifecycle documentation as prioritized by the assessment
+guidelines.
+
+**Response summary:**
+Cursor read SmeErp.Application.Tests (QuotationCalculationTests,
+CompanySettingsDefaultsTests), QuotationTotalsCalculator, test-results.md
+(2/2 passing), and debugging-notes.md. Generated test-strategy.md at the
+repository root covering all six sections: test scope (two automated areas
+vs explicit gaps), detailed descriptions of both mandatory unit tests,
+honest statements that no component or integration tests exist (Stretch
+tier), edge cases table distinguishing automated vs manual verification,
+and Tests Not Covered with rationale (8–12 hour Core budget, mandatory
+tier satisfied, manual verification documented in planning.md and
+debugging-notes.md). Resolves the forward reference in test-results.md,
+which previously pointed to a missing test-strategy.md file.
+
+**Accepted / Changed / Rejected:**
+- Accepted: test-strategy.md added at repo root with all six sections
+  in the correct format.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add test-strategy.md documenting test scope and coverage gaps (prompt #17 entry)"
+
+
+## Prompt #18 — Generate code-review-notes.md and review-fixes.md
+**Date:** 2026-07-24
+
+**Prompt:**
+Based on the actual bugs found and fixed during this project (see
+debugging-notes.md Issues 1-6), and the pattern of reviewing Cursor's
+generated code before committing (checking diffs, verifying against
+manual testing, catching incomplete work), draft two files:
+
+code-review-notes.md:
+
+## AI-Assisted Review Summary
+Describe the actual review process used throughout: after each Cursor
+prompt, code was reviewed for (a) architectural compliance (no
+DbContext in controllers, ServiceResult<T> pattern followed), (b)
+correctness against manually verified data/calculations, and (c)
+completeness (checking the database directly rather than trusting a
+"success" message, which caught several under-delivered prompts).
+
+## My Review Observations
+List specific real observations made during review: Cursor initially
+seeded only Company data when four entity types were requested
+(caught via SSMS inspection); Cursor used Task.WhenAll against a
+shared DbContext in two separate features (SearchService and
+DashboardService), a pattern that should have been avoided from a
+correctness standpoint; a DI registration was missing for
+IQuotationPdfService, breaking an entire controller; a font library
+default caused silent character corruption in generated PDFs.
+
+## Changes Made After Review
+List the actual fixes applied: added missing seed data for Product/
+Customer/CompanySetting; replaced Task.WhenAll with sequential awaits
+in both SearchService and DashboardService; added the missing
+AddScoped registration for IQuotationPdfService in Program.cs; set an
+explicit FontFamily and disabled standard ligatures in
+QuotationPdfService.
+
+## Suggestions Rejected (and why)
+Describe any Cursor suggestions or defaults not accepted: kept MVC
+controllers instead of adding a separate Web API project (assessed as
+unnecessary scope for Core requirements); did not implement public
+self-service tenant registration despite initial interest, since it
+exceeded Core/Stretch scope and would have displaced time needed for
+lifecycle documentation.
+
+review-fixes.md:
+
+For each fix listed above, document: what was found, where in the
+repo it was fixed (reference the actual commit messages, e.g. "Add
+Global Search with DbContext concurrency and DI registration fixes"),
+and how it was verified afterward (re-running the feature manually,
+re-checking cross-tenant isolation).
+
+**Response summary:**
+Cursor read debugging-notes.md (Issues 1–6), ai-prompts/planning.md,
+and Git commit history. Generated code-review-notes.md and
+review-fixes.md at the repository root. code-review-notes.md covers
+the three-part review process (architectural compliance, manual
+correctness verification, SSMS/database completeness checks), six
+specific review observations, five code fixes applied after review,
+and rejected suggestions (no separate Web API, no self-service
+registration, no parallel Task.WhenAll, no default QuestPDF font).
+review-fixes.md documents each fix with what was found, commit hash
+and message (226516f seed data; 7c20d79 search/dashboard concurrency
+and DI registration; 8e2f3b5 PDF font fix), affected files, and
+verification steps including cross-tenant isolation checks; also notes
+environmental Issues 1–2 (stale dotnet processes). Both files
+cross-reference debugging-notes.md and each other.
+
+**Accepted / Changed / Rejected:**
+- Accepted: code-review-notes.md and review-fixes.md added at repo
+  root with all requested sections in the correct format.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add code-review-notes.md and review-fixes.md documenting review process and fixes (prompt #18 entry)"
+
+
+## Prompt #19 — Generate pr-description.md (consolidating 7 merged PRs)
+**Date:** 2026-07-24
+
+**Prompt:**
+Compile pr-description.md at the repo root, consolidating all 7 merged
+pull requests into one document following this structure:
+
+# PR Description
+
+## Overview
+Brief summary noting this project was built across 7 sequential
+feature branches/PRs, each independently tested and verified before
+merge: authentication & roles, products & customers, quotations,
+settings & PDF, UI styling, search & dashboard, and mandatory tests.
+
+Then, for each of the 7 merged PRs (read the actual PR descriptions
+from the GitHub repository's closed/merged pull requests, or
+reconstruct from the corresponding commit messages and
+ai-prompts/planning.md entries if PR descriptions aren't directly
+accessible), include:
+
+## PR #[N]: [Title]
+- Summary
+- Features Implemented
+- Technical Changes
+- Testing Done
+- Known Limitations
+
+Cover, in order: (1) Add authentication, roles, and DB-stored JWT
+signing key, (2) Add Products and Customers list/search pages, (3) Add
+Quotation creation, list, and detail flow, (4) Add Company Settings
+page and Quotation PDF generation, (5) Apply Bootswatch theme and
+card-based UI styling, (6) Add Global Search and Dashboard KPI cards,
+(7) Add mandatory xUnit tests.
+
+Base content on what was actually built, tested, and documented in
+each corresponding phase — do not invent details not already recorded
+in ai-prompts/planning.md or debugging-notes.md.
+
+**Response summary:**
+Cursor attempted to read merged PR descriptions via GitHub CLI (gh
+unavailable); reconstructed pr-description.md from Git merge commits,
+branch names, ai-prompts/planning.md (Prompts #6–#14), debugging-notes.md,
+and test-results.md. Generated pr-description.md at the repository root
+with overview table and seven PR sections (Summary, Features Implemented,
+Technical Changes, Testing Done, Known Limitations each). The branch/PR/
+merge-commit mapping was verified against actual Git history for accuracy:
+PR #1 feature/auth-and-roles (fa40b17), #2 feature/products-customers
+(282a878), #3 feature/quotations (c8f1781), #4 feature/settings-and-pdf
+(7251878), #5 feature/ui-styling (09188b5), #6 feature/search-and-dashboard
+(84d1460), #7 feature/tests (83c3451). Documented cross-PR fixes (DI
+registration, DbContext concurrency, PDF font) and post-merge lifecycle
+documentation. Content limited to recorded planning and debugging evidence.
+
+**Accepted / Changed / Rejected:**
+- Accepted: pr-description.md added at repo root consolidating all
+  seven merged PRs in the correct format; branch/PR mapping verified
+  against Git history.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add pr-description.md consolidating seven merged feature PRs (prompt #19 entry)"
+
