@@ -325,3 +325,55 @@ test` from repo root) and confirmed to work correctly as written.
 
 **Commit:** "Add README.md with setup instructions and project overview (prompt #9 entry)"
 
+
+## Prompt #11 — Generate api-contract.md
+**Date:** 2026-07-24
+
+**Prompt:**
+Read the controllers currently implemented in SmeErp.Web/Controllers
+(AccountController, DashboardController, ProductsController,
+CustomersController, QuotationsController, SettingsController,
+SearchController) and the Application-layer services they call. Draft
+api-contract.md documenting each controller action as an endpoint:
+
+1. Route and HTTP method
+2. Purpose (one sentence)
+3. Request inputs (query params, form fields, route params)
+4. Response/redirect behavior
+5. Authorization requirements ([Authorize] and any role restrictions)
+6. Validation rules enforced
+
+Group by controller. Note explicitly that this project uses MVC
+controllers rather than a separate REST API, so "endpoints" here refer
+to MVC actions rendering Razor views or redirecting, not JSON responses
+(except where noted, e.g. if any AJAX endpoints exist).
+
+Base this strictly on the actual controller definitions and
+Application-layer services in the codebase — do not invent endpoints or
+behaviors that don't exist.
+
+**Response summary:**
+Cursor read all seven controllers in SmeErp.Web/Controllers, their
+view models (LoginViewModel, CreateQuotationViewModel,
+CompanySettingsViewModel), and the Application-layer services they call
+(IDashboardService, IProductService, ICustomerService, IQuotationService,
+ICompanySettingsService, IQuotationPdfService, ISearchService,
+ICurrentCompanyService). Generated api-contract.md at the repository
+root documenting 15 MVC actions grouped by controller, each with route,
+HTTP method, purpose, inputs, response/redirect behavior, authorization,
+and validation rules (controller, data annotations, and service layer).
+The document explicitly states the project uses MVC rather than a REST
+API, notes no JSON/AJAX endpoints exist, identifies DownloadPdf as the
+only non-HTML response (PDF file download), and records that no role-
+based restrictions are enforced beyond [Authorize]. Content was checked
+against actual controller code for accuracy.
+
+**Accepted / Changed / Rejected:**
+- Accepted: api-contract.md added at repo root with all seven controllers
+  documented in the correct format; content verified against controller
+  source.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add api-contract.md documenting MVC controller actions (prompt #11 entry)"
+
