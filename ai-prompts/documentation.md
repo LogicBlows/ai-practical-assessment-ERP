@@ -630,3 +630,69 @@ words — not AI-generated. Added links to related lifecycle documents.
 
 **Commit:** "Add requirements-analysis.md for Option 3 SME ERP scope (prompt #15 entry)"
 
+
+## Prompt #16 — Generate implementation-plan.md
+**Date:** 2026-07-24
+
+**Prompt:**
+Based on the actual sequence of work done in this project (visible in
+ai-prompts/planning.md and the Git commit history), draft
+implementation-plan.md covering:
+
+## Overview
+Brief summary of the build approach: incremental, one feature per
+branch/PR, with manual verification before each merge.
+
+## Task Breakdown
+List the actual sequence of work completed, in order: solution
+scaffold, domain entities, DbContext/migrations, seed data,
+authentication/roles/current-company resolution, DB-stored JWT signing
+key, Products/Customers list+search, Quotation creation/list/detail,
+Company Settings + PDF generation, UI styling pass, Global Search,
+Dashboard KPIs, mandatory xUnit tests.
+
+## Milestones
+Group the above into logical milestones (e.g. "Foundation" =
+scaffold+entities+DB+seed; "Auth & Multi-tenancy" = auth+roles+signing
+key; "Core Business Features" = products/customers/quotations/settings/
+PDF; "Polish & Verification" = styling/search/dashboard/tests).
+
+## AI Usage Plan
+Describe the actual prompting approach used: one scoped prompt per
+feature, explicit architectural constraints given upfront in the first
+prompt, manual verification (running the app, checking SSMS, hand-
+calculating totals) before accepting any feature as complete, and
+documentation generated via Cursor but reviewed/edited before commit.
+
+## Risks
+List real risks that were relevant during development: DbContext
+concurrency issues with parallel async calls (which actually
+materialized twice — see debugging-notes.md Issues 4 and 6), missing
+DI registrations causing silent controller failures, font rendering
+issues in generated PDFs, incomplete AI deliverables requiring follow-up
+prompts, and stale dotnet processes blocking builds.
+
+**Response summary:**
+Cursor read ai-prompts/planning.md (Prompts #1–#14), Git commit history
+(chronological log and feature branch PRs #1–#7), and debugging-notes.md
+(Issues 1–6). Generated implementation-plan.md at the repository root
+covering all five sections: overview (incremental one-feature-per-PR
+approach with manual verification), task breakdown table mapping each
+prompt to commits and PR branches, four milestones (Foundation, Auth &
+Multi-Tenancy, Core Business Features, Polish & Verification), AI usage
+plan (fixed constraints in Prompt #1, scoped prompts, verification
+checklist, reviewed documentation), and risks table documenting issues
+that materialized (DbContext concurrency in SearchService and
+DashboardService, missing IQuotationPdfService DI registration, QuestPDF
+font ligature corruption, incomplete Prompt #4 seed data, stale dotnet
+processes) plus future risks noted. Post-Core documentation commits
+listed separately.
+
+**Accepted / Changed / Rejected:**
+- Accepted: implementation-plan.md added at repo root with all five
+  sections in the correct format.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add implementation-plan.md documenting build sequence and milestones (prompt #16 entry)"
+
