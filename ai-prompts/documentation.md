@@ -564,3 +564,69 @@ but missing.
 
 **Commit:** "Add acceptance-criteria.md cross-referencing Core criteria against implementation (prompt #14 entry)"
 
+
+## Prompt #15 — Generate requirements-analysis.md
+**Date:** 2026-07-24
+
+**Prompt:**
+Draft requirements-analysis.md for the SmeErp project (Option 3: .NET
+Full-Stack SME ERP), covering:
+
+## Selected Project Option
+.NET Full-Stack — SME ERP (Inventory Management)
+
+## My Understanding
+[Leave this section as a placeholder marked "TO BE FILLED IN BY
+DEVELOPER" — this needs to be written in the developer's own words,
+not generated]
+
+## Functional Requirements
+List the actual functional requirements as implemented: authentication,
+multi-tenant company isolation, product/customer list+search,
+quotation creation with line-item calculation, quotation PDF
+generation, company settings management, global search, dashboard KPIs.
+
+## Non-Functional Requirements
+Based on what was actually built: data isolation between tenants,
+no secrets in source control, responsive validation, calculation
+correctness (verified via manual hand-calculation and unit tests).
+
+## Assumptions
+List assumptions actually made during development: one user per
+company (no multi-user-per-company support), no self-service tenant
+registration (companies/users are seeded by the developer), single
+role tier per company (Proprietor) is sufficient for Core scope.
+
+## Clarifications (questions for a product owner)
+List 2-3 realistic open questions this project would raise for a real
+product owner (e.g. should multiple users per company be supported?
+should quotations be editable after creation? should there be an
+approval workflow before a quotation is finalized?).
+
+## Edge Cases
+List edge cases actually handled or considered: company with no
+settings yet (defaults), quotation with zero line items (rejected),
+customer/product belonging to a different company (rejected),
+duplicate signing key generation on startup (guarded against).
+
+**Response summary:**
+Cursor generated requirements-analysis.md at the repository root
+covering all seven sections: selected project option, functional
+requirements (all implemented Core features), non-functional
+requirements (tenant isolation, no secrets, validation, calculation
+correctness), development assumptions, three product-owner clarification
+questions, and edge cases handled in the codebase (with references to
+services, tests, and debugging-notes.md). The "My Understanding"
+section was left as an explicit placeholder ("TO BE FILLED IN BY
+DEVELOPER") for the developer to complete personally in their own
+words — not AI-generated. Added links to related lifecycle documents.
+
+**Accepted / Changed / Rejected:**
+- Accepted: requirements-analysis.md added at repo root with all
+  sections except "My Understanding", which remains a developer-
+  written placeholder.
+- Changed: none.
+- Rejected: none.
+
+**Commit:** "Add requirements-analysis.md for Option 3 SME ERP scope (prompt #15 entry)"
+
